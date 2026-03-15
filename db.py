@@ -36,7 +36,7 @@ def init_db() -> None:
                 repetitions INTEGER DEFAULT 0,
                 ease_factor REAL    DEFAULT 2.5,
                 next_review TEXT    DEFAULT (datetime('now')),
-                created at  TEXT    DEFAULT (datetime('now')),
+                created_at  TEXT    DEFAULT (datetime('now')),
                 FOREIGN KEY(deck_id) REFERENCES decks(id) ON DELETE CASCADE
             );
         """)
