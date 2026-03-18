@@ -38,5 +38,6 @@ def init_db() -> None:
                 next_review TEXT    DEFAULT (datetime('now')),
                 created_at  TEXT    DEFAULT (datetime('now')),
                 FOREIGN KEY(deck_id) REFERENCES decks(id) ON DELETE CASCADE
+                UNIQUE(deck_id, question)
             );
         """)

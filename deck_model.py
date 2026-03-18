@@ -1,4 +1,5 @@
 # Работа с таблицей колод
+from unittest import result
 from db import get_connection
 from sqlite3 import IntegrityError, Row
 
@@ -65,4 +66,13 @@ def is_name_taken(name: str) -> bool:
     """Проверяет, существует ли колода с таким именем."""
     with get_connection() as conn:
         cursor = conn.execute("SELECT id FROM decks WHERE name = ?", (name,))
-        return cursor.fetchone() is not None
+        result = cursor.fetchone()
+        return (
+            result,
+            result is not None,
+        )
+
+
+if __name__ == "__main__":
+    print(is_name_taken("test"))
+    # create_deck("test")
