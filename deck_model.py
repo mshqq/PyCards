@@ -1,5 +1,4 @@
 # Работа с таблицей колод
-from unittest import result
 from db import get_connection
 from sqlite3 import IntegrityError, Row
 
