@@ -1,26 +1,26 @@
 # Основное приложение
 from db import init_db
-import deck_model
+import customtkinter as ctk
+from ui import main_window
 
 
 def main() -> None:
     init_db()
     print("БД инициализирована.")
 
-    # deck_model.create_deck("Тест")
-    # deck_model.create_deck("Тест")
+    ctk.set_appearance_mode("dark")
+    ctk.set_default_color_theme("dark-blue")
 
-    # decks = deck_model.get_all_decks()
-    # for d in decks:
-    #     print(d["name"])
+    app = ctk.CTk()
+    app.title("PyCards")
+    app.geometry("800x600")
+    app.resizable(False, False)
 
-    # print("\n")
+    app.grid_columnconfigure(0, weight=1)
+    app.grid_rowconfigure(0, weight=1)
 
-    # decks_with_counts = deck_model.get_decks_with_counts()
-    # for d in decks_with_counts:
-    #     print(d["name"], d["card_count"])
-
-    # deck_model.update_deck(2, "Тест")
+    main_window.show(app)
+    app.mainloop()
 
 
 if __name__ == "__main__":
