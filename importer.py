@@ -6,31 +6,55 @@ from card_model import create_card
 from sqlite3 import IntegrityError
 
 
-def load_deck(filename, encoding, deck_name=None):
+def load_deck(filename, encoding, deck_name=None) -> tuple[int, int] | None:
+    """Читаёт файл и создаёт карточки в указанной колоде. По умолчанию пытается получить deck_id по названию переданного файла"""
     if not deck_name:
         deck_name = os.path.splitext(os.path.basename(filename))[0]
-    result = is_name_taken(deck_name)
-    if not result[1]:
+
+    record, exists = is_name_taken(deck_name)
+
+    if not exists:
         deck_id = create_deck(deck_name)
     else:
-        deck_id = result[0]["id"]
+        deck_id = record["id"]
+
+    cards_added = 0
+    cards_skipped = 0
+
     try:
         with open(filename, "r", encoding=encoding) as f:
             reader = csv.reader(f, delimiter=";")
+
+            # Первая строка
+            first_row = next(reader, None)
+            if not first_row:
+                return
+
+            # Если первая строка - заголовок, идем дальше
+            # Если нет - то как данные обрабатываем
+            if not (
+                first_row[0].lower().startswith("question")
+                and first_row[1].lower().startswith("answer")
+            ):
+                try:
+                    create_card(deck_id, first_row[0], first_row[1])
+                    cards_added += 1
+                except (IntegrityError, IndexError):
+                    cards_skipped += 1
+
+            # Основной цикл
             for row in reader:
                 if len(row) >= 2:
                     question, answer = row[0], row[1]
-
-                    if question.lower().startswith(
-                        "question"
-                    ) and answer.lower().startswith("answer"):
-                        continue
+                    try:
+                        create_card(deck_id, question, answer)
+                        cards_added += 1
+                    except IntegrityError:
+                        cards_skipped += 1
                 else:
                     continue
-                try:
-                    create_card(deck_id, question, answer)
-                except IntegrityError:
-                    pass
+        return cards_added, cards_skipped
+
     except FileNotFoundError:
         print(f"Ошибка: Файл {filename} не найден.")
     except UnicodeDecodeError:
