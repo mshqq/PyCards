@@ -1,64 +1,56 @@
 # Основное окно
 import customtkinter as ctk
+
+# import ui.constants as const
 import ui.constants as const
 
 
-def show(app) -> None:
+def main_menu(app) -> None:
     for widget in app.winfo_children():
         widget.destroy()
 
-    main_frame = ctk.CTkFrame(master=app, fg_color=const.BG_FRAME)
-    main_frame.grid(row=0, column=0, sticky="nsew")
+    for i in range(8):
+        app.grid_rowconfigure(i, weight=0)
+    app.grid_rowconfigure(0, weight=1)
+    app.grid_columnconfigure(0, weight=1)
 
-    main_frame.grid_columnconfigure(0, weight=1)
-    main_frame.grid_rowconfigure((0, 4), weight=1)
+    main_Label = ctk.CTkLabel(app, text="PyCards", font=("Inter", 32, "bold"))
+    main_Label.grid(row=0, column=0, sticky="nsew")
 
-    title_label = ctk.CTkLabel(
-        main_frame,
-        text="PyCards",
-        font=("Bahnschrift", 38, "bold"),
-        text_color=const.TEXT_PRIMARY,
-    )
-    title_label.grid(row=0, column=0, padx=20, pady=10)
+    buttons_Frame = ctk.CTkFrame(app, fg_color=const.COLOR_BG)
+    buttons_Frame.grid(row=1, column=0, sticky="N")
 
-    btn_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
-    btn_frame.grid(row=3, column=0, pady=(0, 10))
-
-    button_learning = ctk.CTkButton(
-        master=btn_frame,
+    learning_Button = ctk.CTkButton(
+        buttons_Frame,
+        fg_color=const.BUTTON_PRIMARY_BG,
         text="Обучение",
-        font=("Segoe UI", 14),
-        fg_color=const.ACCENT,
-        hover_color=const.ACCENT_HOVER,
-        text_color=const.BG_DARK,
-        corner_radius=10,
-        height=const.BTN_HEIGHT,
-        width=const.BTN_WIDTH,
-        command=lambda: open_learning(app),
-    )
-    button_learning.grid(row=0, column=0, padx=8)
-
-    button_editor = ctk.CTkButton(
-        master=btn_frame,
-        text="Редактор",
-        font=("Segoe UI", 14),
-        fg_color=const.ACCENT,
-        hover_color=const.ACCENT_HOVER,
-        text_color=const.BG_DARK,
-        corner_radius=10,
-        height=const.BTN_HEIGHT,
-        width=const.BTN_WIDTH,
+        font=("Inter", 14, "bold"),
         command=lambda: open_editor(app),
+        corner_radius=15,
+        height=38,
+        width=158,
     )
-    button_editor.grid(row=2, column=0, pady=10)
+    learning_Button.grid(row=0, column=0, pady=(0, 15))
+
+    editor_Button = ctk.CTkButton(
+        buttons_Frame,
+        fg_color=const.BUTTON_SECONDARY_BG,
+        text="Редактор",
+        font=("Inter", 14, "bold"),
+        command=lambda: open_editor(app),
+        corner_radius=15,
+        height=38,
+        width=158,
+    )
+    editor_Button.grid(row=1, column=0)
 
     info_label = ctk.CTkLabel(
-        main_frame,
+        app,
         text="v0.1 by Mshqq",
         font=("Bahnschrift", 15, "bold"),
-        text_color=const.TEXT_MUTED,
+        text_color=const.TEXT_SECONDARY,
     )
-    info_label.grid(row=5, column=0, pady=20)
+    info_label.grid(row=2, column=0, pady=20)
 
 
 def open_learning(app):
@@ -71,5 +63,5 @@ def open_learning(app):
 def open_editor(app):
     from ui import editor_window
 
-    editor_window.show(app)
+    editor_window.editor_decks(app)
     print("Кнопка 'Редактор' нажата")

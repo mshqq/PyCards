@@ -19,7 +19,7 @@ def main() -> None:
     app.grid_columnconfigure(0, weight=1)
     app.grid_rowconfigure(0, weight=1)
 
-    main_window.show(app)
+    main_window.main_menu(app)
     app.mainloop()
 
 

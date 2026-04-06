@@ -1,8 +1,9 @@
 # Импорт CSV
+from card_model import _get_cards_by_deck
 import csv
 import os
-from deck_model import create_deck, is_name_taken
-from card_model import create_card
+from deck_model import _create_deck, _is_name_taken
+from card_model import _create_card
 from sqlite3 import IntegrityError
 
 
@@ -11,10 +12,10 @@ def load_deck(filename, encoding, deck_name=None) -> tuple[int, int] | None:
     if not deck_name:
         deck_name = os.path.splitext(os.path.basename(filename))[0]
 
-    record, exists = is_name_taken(deck_name)
+    record, exists = _is_name_taken(deck_name)
 
     if not exists:
-        deck_id = create_deck(deck_name)
+        deck_id = _create_deck(deck_name)
     else:
         deck_id = record["id"]
 
@@ -22,7 +23,8 @@ def load_deck(filename, encoding, deck_name=None) -> tuple[int, int] | None:
     cards_skipped = 0
 
     try:
-        with open(filename, "r", encoding=encoding) as f:
+        enc = "utf-8-sig" if encoding.lower() in ("utf-8", "utf8") else encoding
+        with open(filename, "r", encoding=enc) as f:
             reader = csv.reader(f, delimiter=";")
 
             # Первая строка
@@ -37,7 +39,7 @@ def load_deck(filename, encoding, deck_name=None) -> tuple[int, int] | None:
                 and first_row[1].lower().startswith("answer")
             ):
                 try:
-                    create_card(deck_id, first_row[0], first_row[1])
+                    _create_card(deck_id, first_row[0], first_row[1])
                     cards_added += 1
                 except (IntegrityError, IndexError):
                     cards_skipped += 1
@@ -47,7 +49,7 @@ def load_deck(filename, encoding, deck_name=None) -> tuple[int, int] | None:
                 if len(row) >= 2:
                     question, answer = row[0], row[1]
                     try:
-                        create_card(deck_id, question, answer)
+                        _create_card(deck_id, question, answer)
                         cards_added += 1
                     except IntegrityError:
                         cards_skipped += 1
@@ -63,9 +65,24 @@ def load_deck(filename, encoding, deck_name=None) -> tuple[int, int] | None:
         )
 
 
+def save_deck(deck_id, filename, path):
+    cards = _get_cards_by_deck(deck_id)
+    file = f"{filename}.csv"
+    full_path = os.path.join(path, file)
+
+    os.makedirs(path, exist_ok=True)
+
+    with open(full_path, "w", encoding="UTF-8", newline="") as csvfile:
+        writer = csv.writer(csvfile, delimiter=";")
+        writer.writerow(["question", "answer"])
+        for card in cards:
+            writer.writerow([card["question"], card["answer"]])
+
+    return full_path
+
+
 if __name__ == "__main__":
-    path = r"E:\Учёба\2 семестр\Программирование\Курсовая\PyCards\test.csv"
-    load_deck(
-        path,
-        encoding="UTF-8",
-    )
+    path = r"E:\Учёба\2 семестр\Программирование\Курсовая\Тестовая папка"
+    name = "Файлик"
+    deck_id = 160
+    save_deck(deck_id, name, path)

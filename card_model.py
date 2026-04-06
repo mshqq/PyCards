@@ -3,7 +3,7 @@ from db import get_connection
 from sqlite3 import IntegrityError, Row
 
 
-def create_card(deck_id: int, question: str, answer: str) -> int | None:
+def _create_card(deck_id: int, question: str, answer: str) -> int | None:
     """Создаёт новую карточку с заданным именем."""
     try:
         with get_connection() as conn:
@@ -16,21 +16,21 @@ def create_card(deck_id: int, question: str, answer: str) -> int | None:
         return None
 
 
-def get_cards_by_deck(deck_id: int) -> list[Row]:
+def _get_cards_by_deck(deck_id: int) -> list[Row]:
     """Возвращает все карточки заданной колоды."""
     with get_connection() as conn:
         cursor = conn.execute("SELECT * FROM cards WHERE deck_id = ?", (deck_id,))
         return cursor.fetchall()
 
 
-def get_card_by_id(card_id) -> Row:
+def _get_card_by_id(card_id) -> Row:
     """Возвращает карточку по её идентификатору"""
     with get_connection() as conn:
         cursor = conn.execute("SELECT * FROM cards WHERE id = ?", (card_id,))
         return cursor.fetchone()
 
 
-def update_card(
+def _update_card(
     card_id: int, question: str = None, answer: str = None, deck_id: int = None
 ):
     """Обновляет данные карточки по её идентификатору."""
@@ -63,14 +63,14 @@ def update_card(
         return False
 
 
-def delete_card(card_id: int) -> bool:
+def _delete_card(card_id: int) -> bool:
     """Удаляет карточку по её идентификатору"""
     with get_connection() as conn:
         cursor = conn.execute("DELETE FROM cards WHERE id = ?", (card_id,))
         return cursor.rowcount > 0
 
 
-def get_cards_for_review(deck_id: int) -> list[Row]:
+def _get_cards_for_review(deck_id: int) -> list[Row]:
     """Возвращает карточки, срок повторения которых наступил или прошёл"""
     query = """
     SELECT *
@@ -84,7 +84,7 @@ def get_cards_for_review(deck_id: int) -> list[Row]:
         return cursor.fetchall()
 
 
-def update_card_sm2(card_id: int, interval: int, repetitions: int, next_review: str):
+def _update_card_sm2(card_id: int, interval: int, repetitions: int, next_review: str):
     """Обновляет SM-2 карточки по её идентификатору."""
     with get_connection() as conn:
         query = """
@@ -99,7 +99,7 @@ def update_card_sm2(card_id: int, interval: int, repetitions: int, next_review: 
 
 if __name__ == "__main__":
     # Тест на получение всех карточек колоды
-    cards = get_cards_by_deck(1)
+    cards = _get_cards_by_deck(1)
     for c in cards:
         print(f"{c['id']} - {c['question']} - {c['answer']}")
     # SUCCESS
