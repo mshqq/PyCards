@@ -25,7 +25,7 @@ def main_menu(app) -> None:
         fg_color=const.BUTTON_PRIMARY_BG,
         text="Обучение",
         font=("Inter", 14, "bold"),
-        command=lambda: open_editor(app),
+        command=lambda: open_learning(app),
         corner_radius=15,
         height=38,
         width=158,
@@ -56,7 +56,7 @@ def main_menu(app) -> None:
 def open_learning(app):
     from ui import review_window
 
-    review_window.show(app)
+    review_window.select_Window(app)
     print("Кнопка 'Обучение' нажата")
 
 

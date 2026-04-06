@@ -25,7 +25,7 @@ def load_deck(filename, encoding, deck_name=None) -> tuple[int, int] | None:
     try:
         enc = "utf-8-sig" if encoding.lower() in ("utf-8", "utf8") else encoding
         with open(filename, "r", encoding=enc) as f:
-            reader = csv.reader(f, delimiter=";")
+            reader = csv.reader(f, delimiter=",")
 
             # Первая строка
             first_row = next(reader, None)
@@ -73,7 +73,7 @@ def save_deck(deck_id, filename, path):
     os.makedirs(path, exist_ok=True)
 
     with open(full_path, "w", encoding="UTF-8", newline="") as csvfile:
-        writer = csv.writer(csvfile, delimiter=";")
+        writer = csv.writer(csvfile, delimiter=",")
         writer.writerow(["question", "answer"])
         for card in cards:
             writer.writerow([card["question"], card["answer"]])
@@ -82,7 +82,7 @@ def save_deck(deck_id, filename, path):
 
 
 if __name__ == "__main__":
-    path = r"E:\Учёба\2 семестр\Программирование\Курсовая\Тестовая папка"
+    path = r"E:\Учёба\2 семестр\Программирование\Курсовая\1_capitals.csv"
     name = "Файлик"
     deck_id = 160
-    save_deck(deck_id, name, path)
+    load_deck(path, "UTF-8", "Столицы")

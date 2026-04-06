@@ -28,6 +28,7 @@ from deck_model import (
 )
 from card_model import _get_cards_by_deck, _delete_card, _update_card, _create_card
 
+IMG_ARROW = ctk.CTkImage(Image.open("icons/arrow.png"), size=(16, 12))
 IMG_DELETE = ctk.CTkImage(Image.open("icons/Delete_png.png"), size=(20, 20))
 IMG_SETTINGS = ctk.CTkImage(Image.open("icons/settings-2.png"), size=(20, 20))
 
@@ -60,7 +61,8 @@ def editor_decks(app, reload=None) -> None:
     # Кнопка "Назад"
     back_button = ctk.CTkButton(
         master=header_frame,
-        text="<",
+        image=IMG_ARROW,
+        text="",
         width=30,
         height=30,
         fg_color="transparent",
@@ -521,7 +523,8 @@ def editor_cards(app, deck, reload=None) -> None:
 
     back_button = ctk.CTkButton(
         master=header_frame,
-        text="<",
+        image=IMG_ARROW,
+        text="",
         width=30,
         height=30,
         fg_color="transparent",

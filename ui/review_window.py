@@ -1,76 +1,321 @@
 # Окно просмотра
 # Основное окно
+from card_model import _get_cards_for_review
+from card_model import _get_cards_by_deck
+from deck_model import _get_decks_with_counts
+from ui import main_window
+from PIL import Image
+
 import customtkinter as ctk
 import ui.constants as const
 
+IMG_ARROW = ctk.CTkImage(Image.open("icons/arrow.png"), size=(16, 12))
 
-def show(app) -> None:
+
+def select_Window(app):
+    def back():
+        main_window.main_menu(app)
+
+    app.configure(fg_color=const.COLOR_BG)
+    app.title("PyCards - Выбор колоды")
+
     for widget in app.winfo_children():
         widget.destroy()
 
-    main_frame = ctk.CTkFrame(master=app, fg_color=const.BG_FRAME)
-    main_frame.grid(row=0, column=0, sticky="nsew")
+    for i in range(8):
+        app.grid_rowconfigure(i, weight=0)
+    app.grid_columnconfigure(0, weight=1)
+    app.grid_rowconfigure(1, weight=1)
 
-    main_frame.grid_columnconfigure(0, weight=1)
-    main_frame.grid_rowconfigure((0, 4), weight=1)
-
-    title_label = ctk.CTkLabel(
-        main_frame,
-        text="Обучение",
-        font=("Bahnschrift", 38, "bold"),
-        text_color=const.TEXT_PRIMARY,
+    # header_frame
+    header_Frame = ctk.CTkFrame(
+        master=app, height=38, width=740, fg_color=const.COLOR_BG
     )
-    title_label.grid(row=0, column=0, padx=20, pady=10)
+    header_Frame.grid(row=0, column=0, pady=(15, 0), sticky="EW", padx=20)
+    header_Frame.rowconfigure((0, 1), weight=0)
+    header_Frame.columnconfigure(0, weight=0)
+    header_Frame.columnconfigure(1, weight=1)
 
-    btn_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
-    btn_frame.grid(row=3, column=0, pady=(0, 10))
-
-    button_learning = ctk.CTkButton(
-        master=btn_frame,
-        text="Обучение",
-        font=("Segoe UI", 14),
-        fg_color=const.ACCENT,
-        hover_color=const.ACCENT_HOVER,
-        text_color=const.BG_DARK,
-        corner_radius=10,
-        height=const.BTN_HEIGHT,
-        width=const.BTN_WIDTH,
-        command=lambda: open_learning(app),
+    # Кнопка "Назад"
+    back_Button = ctk.CTkButton(
+        master=header_Frame,
+        image=IMG_ARROW,
+        text="",
+        width=30,
+        height=30,
+        fg_color="transparent",
+        hover_color="#27272A",
+        command=lambda: back(),
+        font=("Inter", 18, "bold"),
     )
-    button_learning.grid(row=0, column=0, padx=8)
+    back_Button.grid(row=0, column=0, sticky="W", padx=10)
 
-    button_editor = ctk.CTkButton(
-        master=btn_frame,
-        text="Редактор",
-        font=("Segoe UI", 14),
-        fg_color=const.ACCENT,
-        hover_color=const.ACCENT_HOVER,
-        text_color=const.BG_DARK,
-        corner_radius=10,
-        height=const.BTN_HEIGHT,
-        width=const.BTN_WIDTH,
-        command=lambda: open_editor(app),
+    # Заголовок "Выбор колоды"
+    header_Label = ctk.CTkLabel(
+        master=header_Frame, text="Выбор колоды", font=("Inter", 24, "bold")
     )
-    button_editor.grid(row=2, column=0, pady=10)
+    header_Label.grid(row=0, column=1, sticky="W")
 
-    info_label = ctk.CTkLabel(
-        main_frame,
-        text="v0.1 by Mshqq",
-        font=("Bahnschrift", 15, "bold"),
-        text_color=const.TEXT_MUTED,
+    decks_Frame = ctk.CTkScrollableFrame(
+        app,
+        width=760,
+        height=500,
+        fg_color=const.COLOR_BG,
+        scrollbar_button_color="#303037",
     )
-    info_label.grid(row=4, column=0, pady=20)
+    decks_Frame.grid(row=1, column=0, sticky="EW", padx=20)
+    decks_Frame.columnconfigure((0, 1, 2), weight=1)
+
+    all_decks = _get_decks_with_counts()
+    decks = [all_decks[i : i + 3] for i in range(0, len(all_decks), 3)]
+
+    for row_index, row in enumerate(decks):
+        for deck_index, deck in enumerate(row):
+            deck_Frame = ctk.CTkFrame(
+                decks_Frame,
+                fg_color=const.FRAME_BG,
+                border_width=2,
+                border_color=const.FRAME_BORDER,
+                height=155,
+                width=226,
+                corner_radius=15,
+            )
+            deck_Frame.grid(
+                row=1 + row_index,
+                column=0 + deck_index,
+                padx=10,
+                pady=(0, 15),
+            )
+            deck_Frame.grid_columnconfigure(0, weight=1)
+            deck_Frame.grid_rowconfigure((0, 1, 2), weight=0)
+            deck_Frame.grid_propagate(False)
+
+            # Название колоды
+            name_Label = ctk.CTkLabel(
+                master=deck_Frame,
+                text=deck["name"],
+                font=("Inter", 14, "bold"),
+                anchor="w",
+            )
+            name_Label.grid(row=0, column=0, padx=(15, 10), pady=(10, 0), sticky="W")
+
+            stats_Frame = ctk.CTkFrame(
+                deck_Frame,
+                height=23,
+                width=93,
+                fg_color=const.FRAME_BG,
+            )
+            stats_Frame.grid(row=1, column=0, padx=(15, 10), pady=(4, 0), sticky="W")
+            stats_Frame.columnconfigure(0, weight=0)
+            stats_Frame.rowconfigure((0, 1), weight=0)
+
+            countCards = len(_get_cards_by_deck(deck["id"]))
+
+            countCards_Label = ctk.CTkLabel(
+                stats_Frame,
+                text=f"Всего карточек: {countCards}",
+                font=("Inter", 14),
+                fg_color=const.FRAME_BG,
+            )
+            countCards_Label.grid(row=0, column=0, sticky="W", pady=0)
+
+            toLearnCards = len(_get_cards_for_review(deck["id"]))
+
+            toLearnCards_Label = ctk.CTkLabel(
+                stats_Frame,
+                text=f"К повторению: {toLearnCards}",
+                font=("Inter", 14),
+                fg_color=const.FRAME_BG,
+            )
+            toLearnCards_Label.grid(row=1, column=0, sticky="W")
+
+            buttons_Frame = ctk.CTkFrame(deck_Frame, fg_color=const.FRAME_BG)
+            buttons_Frame.grid(row=2, column=0, padx=(15, 10), pady=(5, 0), sticky="EW")
+            buttons_Frame.rowconfigure(0, weight=0)
+            buttons_Frame.columnconfigure((0, 1), weight=1)
+
+            learning_Button = ctk.CTkButton(
+                buttons_Frame,
+                text="Обучение",
+                height=38,
+                width=90,
+                font=("Inter", 12, "bold"),
+                corner_radius=15,
+                fg_color=const.BUTTON_PRIMARY_BG,
+                command=lambda deck=deck: learning_Window(app, deck),
+            )
+            learning_Button.grid(row=0, column=0, padx=(0, 6))
+
+            view_Button = ctk.CTkButton(
+                buttons_Frame,
+                text="Просмотр",
+                height=38,
+                width=90,
+                font=("Inter", 12, "bold"),
+                corner_radius=15,
+                fg_color=const.BUTTON_SECONDARY_BG,
+                command=lambda deck=deck: viewer_Window(app, deck),
+            )
+            view_Button.grid(row=0, column=1, padx=(6, 0))
 
 
-def open_learning(app):
-    from ui import review_window
-
-    review_window.show(app)
-    print("Кнопка 'Обучение' нажата")
+def learning_Window(app, deck):
+    pass
 
 
-def open_editor(app):
-    from ui import editor_window
+def viewer_Window(app, deck):
+    def back():
+        select_Window(app)
 
-    editor_window.show(app)
-    print("Кнопка 'Редактор' нажата")
+    def go_next(pointer):
+        pointer += 1
+        render(pointer)
+
+    def go_prev(pointer):
+        pointer -= 1
+        render(pointer)
+
+    def showAnswer(answer_Label, showAnswer_Button):
+        answer_Label.configure(text_color="#FFF")
+        showAnswer_Button.configure(state="disabled")
+
+    def render(pointer):
+        if pointer < 0:
+            pointer = 0
+        try:
+            current_card = all_cards[pointer]
+        except IndexError:
+            pointer -= 1
+            current_card = all_cards[pointer]
+
+        app.configure(fg_color=const.COLOR_BG)
+        app.title("PyCards - Просмотр колоды")
+
+        for widget in app.winfo_children():
+            widget.destroy()
+
+        for i in range(8):
+            app.grid_rowconfigure(i, weight=0)
+        app.grid_columnconfigure(0, weight=1)
+        app.grid_rowconfigure((0, 1, 2), weight=0)
+
+        # header_frame
+        header_Frame = ctk.CTkFrame(
+            master=app, height=38, width=740, fg_color=const.COLOR_BG
+        )
+        header_Frame.grid(row=0, column=0, pady=15, sticky="EW", padx=20)
+        header_Frame.rowconfigure(0, weight=1)
+        header_Frame.columnconfigure((0, 1, 2), weight=1)
+        header_Frame.columnconfigure(0, weight=0)
+
+        # Кнопка "Назад"
+        back_button = ctk.CTkButton(
+            master=header_Frame,
+            image=IMG_ARROW,
+            text="",
+            width=30,
+            height=30,
+            fg_color="transparent",
+            hover_color="#27272A",
+            command=lambda: back(),
+            font=("Inter", 18, "bold"),
+        )
+        back_button.grid(row=0, column=0, sticky="W", padx=10)
+
+        # # Статистика "Режим просмотра: 1/2"
+        stats_Frame = ctk.CTkFrame(
+            header_Frame,
+            height=30,
+            width=161,
+            fg_color="#1F1F22",
+            border_width=1,
+            border_color=const.FRAME_BORDER,
+            corner_radius=15,
+        )
+        stats_Frame.grid(row=0, column=1, columnspan=2, sticky="E")
+        stats_Frame.columnconfigure(0, weight=1)
+        stats_Frame.rowconfigure(0, weight=1)
+        stats_Frame.grid_propagate(False)
+
+        msg = f"Режим просмотра: {pointer + 1}/{len(all_cards)}"
+
+        stats_Label = ctk.CTkLabel(
+            master=stats_Frame,
+            text=msg,
+            font=("Inter", 12, "bold"),
+        )
+        stats_Label.grid(row=0, column=0)
+
+        question_Frame = ctk.CTkFrame(
+            app,
+            fg_color="#242427",
+            height=453,
+            width=600,
+            border_width=2,
+            border_color=const.FRAME_BORDER,
+            corner_radius=15,
+        )
+        question_Frame.grid(row=1, column=0, padx=50)
+        question_Frame.columnconfigure(0, weight=1)
+        question_Frame.rowconfigure(1, weight=0)
+        question_Frame.grid_propagate(False)
+
+        question_Label = ctk.CTkLabel(
+            question_Frame,
+            text=current_card["question"],
+            font=("Inter", 16, "bold"),
+        )
+        question_Label.grid(row=0, column=0, pady=(140, 40))
+
+        answer_Label = ctk.CTkLabel(
+            question_Frame,
+            text=current_card["answer"],
+            font=("Inter", 14),
+            text_color=const.FRAME_BG,
+        )
+        answer_Label.grid(row=1, column=0)
+
+        app.grid_rowconfigure(1, weight=0)
+
+        buttons_Frame = ctk.CTkFrame(app, fg_color=const.COLOR_BG)
+        buttons_Frame.grid(row=2, column=0, pady=(15, 0))
+        buttons_Frame.rowconfigure(0, weight=0)
+        buttons_Frame.columnconfigure((0, 1, 2), weight=1)
+
+        prev_Button = ctk.CTkButton(
+            buttons_Frame,
+            fg_color=const.BUTTON_SECONDARY_BG,
+            font=("Inter", 14, "bold"),
+            height=38,
+            width=123,
+            corner_radius=15,
+            text="Назад",
+            command=lambda: go_prev(pointer),
+        )
+        prev_Button.grid(row=0, column=0)
+        showAnswer_Button = ctk.CTkButton(
+            buttons_Frame,
+            fg_color=const.BUTTON_PRIMARY_BG,
+            font=("Inter", 14, "bold"),
+            height=38,
+            width=123,
+            corner_radius=15,
+            text="Показать ответ",
+            command=lambda: showAnswer(answer_Label, showAnswer_Button),
+        )
+        showAnswer_Button.grid(row=0, column=1, padx=110)
+        next_Button = ctk.CTkButton(
+            buttons_Frame,
+            fg_color=const.BUTTON_SECONDARY_BG,
+            font=("Inter", 14, "bold"),
+            height=38,
+            width=123,
+            corner_radius=15,
+            text="Вперед",
+            command=lambda: go_next(pointer),
+        )
+        next_Button.grid(row=0, column=2)
+
+    all_cards = _get_cards_by_deck(deck["id"])
+    pointer = 0
+    render(pointer)
