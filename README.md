@@ -1,5 +1,9 @@
 ## Проект: PyCards
 #### Desktop-приложение для обучения с карточками
+![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python&logoCol+or=white)                                                                       
+![Platform](https://img.shields.io/badge/Platform-Windows-0078D4?logo=windo+ws&logoColor=white)
+![Last Commit](https://img.shields.io/github/last-commit/mshqq/PyCards)
+![License](https://img.shields.io/badge/License-MIT-green)  
 ---
 # 1. Назначение приложения
 PyCards - это настольное приложение для обучения методом интервальных повторений (аналог Anki). Пользователь создаёт колоды карточек формата "вопрос -> ответ" и повторяет по расписанию, которое автоматически строится на основе упрощённого алгоритма интервальных повторений, вдохновлённый SM-2, также присутствует функция импорта карточек из CSV-файлов.
