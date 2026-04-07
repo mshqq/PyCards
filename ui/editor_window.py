@@ -1,23 +1,9 @@
 # Окно редактора
 # Основное окно
 from ui import main_window
-import customtkinter as ctk
-
 from ui.utils import alert
-from PIL import Image
-
 import ui.constants as const
-# import constants as const
-
-import sys
-import chardet
-from pathlib import Path
-
-
-sys.path.append(str(Path(__file__).parent.parent))
-
-from importer import load_deck, save_deck
-
+from csv_io import load_deck, save_deck
 from deck_model import (
     _get_decks_with_counts,
     _delete_deck,
@@ -27,6 +13,15 @@ from deck_model import (
     _get_all_decks,
 )
 from card_model import _get_cards_by_deck, _delete_card, _update_card, _create_card
+
+import customtkinter as ctk
+from PIL import Image
+
+import sys
+import chardet
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).parent.parent))
 
 IMG_ARROW = ctk.CTkImage(Image.open("icons/arrow.png"), size=(16, 12))
 IMG_DELETE = ctk.CTkImage(Image.open("icons/Delete_png.png"), size=(20, 20))
@@ -66,15 +61,19 @@ def editor_decks(app, reload=None) -> None:
         width=30,
         height=30,
         fg_color="transparent",
-        hover_color="#27272A",
+        hover_color=const.COLOR_BORDER,
         command=lambda: back(),
         font=("Inter", 18, "bold"),
+        text_color=const.TEXT_PRIMARY,
     )
     back_button.grid(row=0, column=0, sticky="W", padx=10)
 
     # Заголовок "Колоды"
     decks_label = ctk.CTkLabel(
-        master=header_frame, text="Колоды", font=("Inter", 24, "bold")
+        master=header_frame,
+        text="Колоды",
+        font=("Inter", 24, "bold"),
+        text_color=const.TEXT_PRIMARY,
     )
     decks_label.grid(row=0, column=1, sticky="W")
 
@@ -82,13 +81,14 @@ def editor_decks(app, reload=None) -> None:
     create_button = ctk.CTkButton(
         master=header_frame,
         text="+ Создать",
-        fg_color="#155DFC",
-        hover_color="#1447E6",
+        fg_color=const.BUTTON_PRIMARY_BG,
+        hover_color=const.BUTTON_PRIMARY_HOVER,
         font=("Inter", 16, "bold"),
         corner_radius=15,
         height=38,
         width=92,
         command=lambda app=app: create_deck(app),
+        text_color=const.TEXT_PRIMARY,
     )
     create_button.grid(row=0, column=2, sticky="E", padx=10)
 
@@ -98,7 +98,7 @@ def editor_decks(app, reload=None) -> None:
         width=760,
         height=500,
         fg_color=const.COLOR_BG,
-        scrollbar_button_color="#303037",
+        scrollbar_button_color=const.SCROLLBAR_BG,
     )
     decks_frame.grid(row=1, column=0, padx=20, sticky="EW")
 
@@ -107,11 +107,11 @@ def editor_decks(app, reload=None) -> None:
         # Фрейм под колоду
         deck_frame = ctk.CTkFrame(
             master=decks_frame,
-            fg_color="#242427",
+            fg_color=const.FRAME_BG,
             height=90,
             width=730,
             border_width=2,
-            border_color="#303037",
+            border_color=const.SCROLLBAR_BG,
             corner_radius=15,
         )
         deck_frame.grid(
@@ -123,7 +123,10 @@ def editor_decks(app, reload=None) -> None:
 
         # Название колоды
         name_label = ctk.CTkLabel(
-            master=deck_frame, text=deck["name"], font=("Inter", 16, "bold")
+            master=deck_frame,
+            text=deck["name"],
+            font=("Inter", 16, "bold"),
+            text_color=const.TEXT_PRIMARY,
         )
         name_label.grid(row=0, column=0, padx=(15, 10))
 
@@ -152,7 +155,7 @@ def editor_decks(app, reload=None) -> None:
             corner_radius=15,
             text_color=const.WHITE,
             fg_color=const.BUTTON_SECONDARY_BG,
-            hover_color="#51515C",
+            hover_color=const.BUTTON_SECONDARY_HOVER,
             command=lambda deck=deck, app=app: editor_cards(app, deck),
         )
         open_button.grid(row=0, column=1)
@@ -167,7 +170,7 @@ def editor_decks(app, reload=None) -> None:
             corner_radius=15,
             text_color=const.WHITE,
             fg_color=const.BUTTON_SECONDARY_BG,
-            hover_color="#51515C",
+            hover_color=const.BUTTON_SECONDARY_HOVER,
             command=lambda d=deck: settings_deck(d, app),
         )
         settings_button.grid(row=0, column=2, padx=5)
@@ -182,7 +185,7 @@ def editor_decks(app, reload=None) -> None:
             corner_radius=15,
             fg_color=const.BUTTON_DELETE_BG,
             text_color=const.BUTTON_DELETE_TEXT,
-            hover_color="#51282C",
+            hover_color=const.BUTTON_DELETE_HOVER,
             command=lambda id=deck: delete_deck(id, app),
         )
         delete_button.grid(row=0, column=3)
@@ -192,7 +195,6 @@ def editor_decks(app, reload=None) -> None:
 def create_deck(app):
     def cancel():
         createDeck_TopUp.destroy()
-        createDeck_TopUp.update()
 
     def create():
         name = input_Entry.get()
@@ -207,7 +209,6 @@ def create_deck(app):
             return
 
         createDeck_TopUp.destroy()
-        createDeck_TopUp.update()
         editor_decks(app, reload=True)
 
     # Модальное окно создания колоды
@@ -227,7 +228,10 @@ def create_deck(app):
     header_Frame.columnconfigure(1, weight=0)
 
     header_Label = ctk.CTkLabel(
-        header_Frame, text="Создать колоду", font=("Inter", 16, "bold")
+        header_Frame,
+        text="Создать колоду",
+        font=("Inter", 16, "bold"),
+        text_color=const.TEXT_PRIMARY,
     )
     header_Label.grid(row=0, column=0, sticky="W")
 
@@ -239,6 +243,8 @@ def create_deck(app):
         font=("Inter", 16, "bold"),
         fg_color="transparent",
         command=lambda: cancel(),
+        text_color=const.TEXT_PRIMARY,
+        hover_color=const.COLOR_BORDER,
     )
     header_Button.grid(row=0, column=1, sticky="E")
 
@@ -246,7 +252,12 @@ def create_deck(app):
     input_Frame = ctk.CTkFrame(createDeck_TopUp, fg_color=const.COLOR_BG)
     input_Frame.grid(row=1, column=0, padx=15, pady=(25, 0))
 
-    input_Label = ctk.CTkLabel(input_Frame, text="Название колоды", font=("Inter", 14))
+    input_Label = ctk.CTkLabel(
+        input_Frame,
+        text="Название колоды",
+        font=("Inter", 14),
+        text_color=const.TEXT_PRIMARY,
+    )
     input_Label.grid(row=0, column=0, sticky="W", pady=5)
 
     input_Entry = ctk.CTkEntry(
@@ -275,6 +286,7 @@ def create_deck(app):
         fg_color=const.BUTTON_SECONDARY_BG,
         text_color=const.BUTTON_SECONDARY_TEXT,
         command=lambda: cancel(),
+        hover_color=const.BUTTON_SECONDARY_HOVER,
     )
     cancel_Button.grid(row=0, column=0, padx=10)
 
@@ -288,6 +300,7 @@ def create_deck(app):
         fg_color=const.BUTTON_PRIMARY_BG,
         text_color=const.BUTTON_PRIMARY_TEXT,
         command=lambda: create(),
+        hover_color=const.BUTTON_PRIMARY_HOVER,
     )
     create_Button.grid(row=0, column=1)
 
@@ -298,13 +311,11 @@ def create_deck(app):
 def delete_deck(deck, app):
     def cancel():
         confirmation_TopUp.destroy()
-        confirmation_TopUp.update()
 
     def delete():
         _delete_deck(deck["id"])
 
         confirmation_TopUp.destroy()
-        confirmation_TopUp.update()
 
         editor_decks(app, True)
 
@@ -325,7 +336,10 @@ def delete_deck(deck, app):
     header_Frame.columnconfigure(1, weight=0)
 
     header_Label = ctk.CTkLabel(
-        header_Frame, text="Удалить колоду", font=("Inter", 16, "bold")
+        header_Frame,
+        text="Удалить колоду",
+        font=("Inter", 16, "bold"),
+        text_color=const.TEXT_PRIMARY,
     )
     header_Label.grid(row=0, column=0, sticky="W")
 
@@ -337,6 +351,8 @@ def delete_deck(deck, app):
         font=("Inter", 16, "bold"),
         fg_color="transparent",
         command=lambda: cancel(),
+        text_color=const.TEXT_PRIMARY,
+        hover_color=const.COLOR_BORDER,
     )
     header_Button.grid(row=0, column=1, sticky="E")
 
@@ -351,6 +367,7 @@ def delete_deck(deck, app):
         wraplength=450,
         anchor="w",
         justify="left",
+        text_color=const.TEXT_PRIMARY,
     )
     confirmation_Label.grid(row=1, column=0, padx=15, pady=(36, 0), sticky="EW")
 
@@ -368,6 +385,7 @@ def delete_deck(deck, app):
         fg_color=const.BUTTON_SECONDARY_BG,
         text_color=const.BUTTON_SECONDARY_TEXT,
         command=lambda: cancel(),
+        hover_color=const.BUTTON_SECONDARY_HOVER,
     )
     cancel_Button.grid(row=0, column=0, padx=10)
 
@@ -381,6 +399,7 @@ def delete_deck(deck, app):
         fg_color=const.BUTTON_CONFIRM_BG,
         text_color=const.BUTTON_CONFIRM_TEXT,
         command=lambda: delete(),
+        hover_color=const.BUTTON_CONFIRM_BG_HOVER,
     )
     delete_Button.grid(row=0, column=1)
 
@@ -391,7 +410,6 @@ def delete_deck(deck, app):
 def settings_deck(deck, app):
     def cancel():
         deckSettings_TopUp.destroy()
-        deckSettings_TopUp.update()
 
     def update():
         id = deck["id"]
@@ -408,7 +426,6 @@ def settings_deck(deck, app):
             return
 
         deckSettings_TopUp.destroy()
-        deckSettings_TopUp.update()
         editor_decks(app, reload=True)
 
     # Модальное окно с настройками колоды
@@ -428,7 +445,10 @@ def settings_deck(deck, app):
     header_Frame.columnconfigure(1, weight=0)
 
     header_Label = ctk.CTkLabel(
-        header_Frame, text="Настройки колоды", font=("Inter", 16, "bold")
+        header_Frame,
+        text="Настройки колоды",
+        font=("Inter", 16, "bold"),
+        text_color=const.TEXT_PRIMARY,
     )
     header_Label.grid(row=0, column=0, sticky="W")
 
@@ -440,6 +460,8 @@ def settings_deck(deck, app):
         font=("Inter", 16, "bold"),
         fg_color="transparent",
         command=lambda: cancel(),
+        text_color=const.TEXT_PRIMARY,
+        hover_color=const.COLOR_BORDER,
     )
     header_Button.grid(row=0, column=1, sticky="E")
 
@@ -447,7 +469,12 @@ def settings_deck(deck, app):
     input_Frame = ctk.CTkFrame(deckSettings_TopUp, fg_color=const.COLOR_BG)
     input_Frame.grid(row=1, column=0, padx=15, pady=(25, 0))
 
-    input_Label = ctk.CTkLabel(input_Frame, text="Новое название", font=("Inter", 14))
+    input_Label = ctk.CTkLabel(
+        input_Frame,
+        text="Новое название",
+        font=("Inter", 14),
+        text_color=const.TEXT_PRIMARY,
+    )
     input_Label.grid(row=0, column=0, sticky="W", pady=5)
 
     name = deck["name"]
@@ -477,6 +504,7 @@ def settings_deck(deck, app):
         fg_color=const.BUTTON_SECONDARY_BG,
         text_color=const.BUTTON_SECONDARY_TEXT,
         command=lambda: cancel(),
+        hover_color=const.BUTTON_SECONDARY_HOVER,
     )
     cancel_Button.grid(row=0, column=0, padx=10)
 
@@ -490,6 +518,7 @@ def settings_deck(deck, app):
         fg_color=const.BUTTON_PRIMARY_BG,
         text_color=const.BUTTON_PRIMARY_TEXT,
         command=lambda: update(),
+        hover_color=const.BUTTON_PRIMARY_HOVER,
     )
     save_Button.grid(row=0, column=1)
 
@@ -528,9 +557,10 @@ def editor_cards(app, deck, reload=None) -> None:
         width=30,
         height=30,
         fg_color="transparent",
-        hover_color="#27272A",
+        hover_color=const.COLOR_BORDER,
         font=("Inter", 18, "bold"),
         command=lambda: editor_decks(app),
+        text_color=const.TEXT_PRIMARY,
     )
     back_button.grid(row=0, column=0, sticky="W", padx=10)
 
@@ -539,6 +569,7 @@ def editor_cards(app, deck, reload=None) -> None:
         master=header_frame,
         text="Карточки",
         font=("Inter", 24, "bold"),
+        text_color=const.TEXT_PRIMARY,
     )
     cards_label.grid(row=0, column=1, sticky="W")
 
@@ -551,12 +582,13 @@ def editor_cards(app, deck, reload=None) -> None:
         master=buttons_Frame,
         text="Импорт",
         fg_color=const.BUTTON_SECONDARY_BG,
-        hover_color="#1447E6",
+        hover_color=const.BUTTON_SECONDARY_HOVER,
         font=("Inter", 16, "bold"),
         corner_radius=15,
         height=38,
         width=92,
         command=lambda d=deck, app=app: import_cards(d, app),
+        text_color=const.TEXT_PRIMARY,
     )
     import_Button.grid(row=0, column=0)
 
@@ -565,12 +597,13 @@ def editor_cards(app, deck, reload=None) -> None:
         master=buttons_Frame,
         text="Экспорт",
         fg_color=const.BUTTON_SECONDARY_BG,
-        hover_color="#1447E6",
+        hover_color=const.BUTTON_SECONDARY_HOVER,
         font=("Inter", 16, "bold"),
         corner_radius=15,
         height=38,
         width=92,
         command=lambda d=deck, app=app: export_cards(d, app),
+        text_color=const.TEXT_PRIMARY,
     )
     export_Button.grid(row=0, column=1, padx=10)
 
@@ -578,13 +611,14 @@ def editor_cards(app, deck, reload=None) -> None:
     create_Button = ctk.CTkButton(
         master=buttons_Frame,
         text="+ Создать",
-        fg_color="#155DFC",
-        hover_color="#1447E6",
+        fg_color=const.BUTTON_PRIMARY_BG,
+        hover_color=const.BUTTON_PRIMARY_HOVER,
         font=("Inter", 16, "bold"),
         corner_radius=15,
         height=38,
         width=92,
         command=lambda d=deck, app=app: create_card(d, app),
+        text_color=const.TEXT_PRIMARY,
     )
     create_Button.grid(row=0, column=2)
 
@@ -594,7 +628,7 @@ def editor_cards(app, deck, reload=None) -> None:
         width=760,
         height=500,
         fg_color=const.COLOR_BG,
-        scrollbar_button_color="#303037",
+        scrollbar_button_color=const.SCROLLBAR_BG,
     )
     cards_frame.grid(row=1, column=0, padx=20, sticky="EW")
 
@@ -603,11 +637,11 @@ def editor_cards(app, deck, reload=None) -> None:
         # Фрейм под карточку
         card_frame = ctk.CTkFrame(
             master=cards_frame,
-            fg_color="#242427",
+            fg_color=const.FRAME_BG,
             height=90,
             width=730,
             border_width=2,
-            border_color="#303037",
+            border_color=const.SCROLLBAR_BG,
             corner_radius=15,
         )
         card_frame.grid(
@@ -626,7 +660,7 @@ def editor_cards(app, deck, reload=None) -> None:
             answer = answer[:80] + "..."
 
         # Фрейм под данные карточки
-        cardData_Frame = ctk.CTkFrame(master=card_frame, fg_color="#242427")
+        cardData_Frame = ctk.CTkFrame(master=card_frame, fg_color=const.FRAME_BG)
         cardData_Frame.grid(row=0, column=0, sticky="W", padx=(15, 0))
         cardData_Frame.grid_columnconfigure(0, weight=1)
         cardData_Frame.grid_rowconfigure((0, 1), weight=1)
@@ -663,9 +697,10 @@ def editor_cards(app, deck, reload=None) -> None:
             height=35,
             width=20,
             corner_radius=10,
-            fg_color="#3F3F46",
-            hover_color="#51515C",
+            fg_color=const.BUTTON_SECONDARY_BG,
+            hover_color=const.BUTTON_SECONDARY_HOVER,
             command=lambda c=card, d=deck: settings_card(c, d, app),
+            text_color=const.TEXT_PRIMARY,
         )
         settings_Button.grid(row=0, column=2, padx=(0, 5))
         delete_Button = ctk.CTkButton(
@@ -676,9 +711,9 @@ def editor_cards(app, deck, reload=None) -> None:
             height=35,
             width=20,
             corner_radius=10,
-            fg_color="#392529",
-            text_color="#FF6467",
-            hover_color="#51282C",
+            fg_color=const.BUTTON_DELETE_BG,
+            text_color=const.BUTTON_DELETE_TEXT,
+            hover_color=const.BUTTON_DELETE_HOVER,
             command=lambda id=card: delete_card(id, deck, app),
         )
         delete_Button.grid(row=0, column=3, padx=(0, 5))
@@ -687,7 +722,6 @@ def editor_cards(app, deck, reload=None) -> None:
 def import_cards(deck, app):
     def cancel():
         import_TopUp.destroy()
-        import_TopUp.update()
 
     def import_from_csv():
         path = path_Entry.get()
@@ -700,11 +734,16 @@ def import_cards(deck, app):
             alert(import_TopUp, "Вы не путь к файлу!")
             return
 
+        try:
+            load_deck(path, encoding, deck["name"])
+        except FileNotFoundError:
+            alert(import_TopUp, "Файл не найден")
+            return
+        except UnicodeDecodeError:
+            alert(import_TopUp, "Ошибка чтения файла. Попробуйте сменить кодировку")
+            return
+
         import_TopUp.destroy()
-        import_TopUp.update()
-
-        load_deck(path, encoding, deck["name"])
-
         editor_cards(app, deck, True)
 
     import_TopUp = ctk.CTkToplevel(app)
@@ -723,7 +762,10 @@ def import_cards(deck, app):
     header_Frame.columnconfigure(1, weight=0)
 
     header_Label = ctk.CTkLabel(
-        header_Frame, text="Импорт карточек", font=("Inter", 16, "bold")
+        header_Frame,
+        text="Импорт карточек",
+        font=("Inter", 16, "bold"),
+        text_color=const.TEXT_PRIMARY,
     )
     header_Label.grid(row=0, column=0, sticky="W")
 
@@ -735,6 +777,8 @@ def import_cards(deck, app):
         font=("Inter", 16, "bold"),
         fg_color="transparent",
         command=lambda: cancel(),
+        text_color=const.TEXT_PRIMARY,
+        hover_color=const.COLOR_BORDER,
     )
     header_Button.grid(row=0, column=1, sticky="E")
 
@@ -744,7 +788,10 @@ def import_cards(deck, app):
     path_Frame.grid(row=1, column=0, padx=15, pady=10, sticky="EW")
 
     path_Label = ctk.CTkLabel(
-        path_Frame, text="Путь к файлу", font=("Inter", 16, "bold")
+        path_Frame,
+        text="Путь к файлу",
+        font=("Inter", 16, "bold"),
+        text_color=const.TEXT_PRIMARY,
     )
     path_Label.grid(row=0, column=0, sticky="W")
 
@@ -788,6 +835,8 @@ def import_cards(deck, app):
         height=50,
         width=93,
         command=lambda: insert_filepath(),
+        text_color=const.TEXT_PRIMARY,
+        hover_color=const.BUTTON_SECONDARY_HOVER,
     )
     path_Button.grid(row=0, column=1, sticky="E")
 
@@ -797,7 +846,10 @@ def import_cards(deck, app):
     encoding_Frame.columnconfigure(0, weight=1)
 
     encoding_Label = ctk.CTkLabel(
-        encoding_Frame, text="Кодировка", font=("Inter", 16, "bold")
+        encoding_Frame,
+        text="Кодировка",
+        font=("Inter", 16, "bold"),
+        text_color=const.TEXT_PRIMARY,
     )
     encoding_Label.grid(row=0, column=0, sticky="W")
 
@@ -827,6 +879,7 @@ def import_cards(deck, app):
         fg_color=const.BUTTON_SECONDARY_BG,
         text_color=const.BUTTON_SECONDARY_TEXT,
         command=lambda: cancel(),
+        hover_color=const.BUTTON_SECONDARY_HOVER,
     )
     cancel_Button.grid(row=0, column=0, padx=10)
 
@@ -840,6 +893,7 @@ def import_cards(deck, app):
         fg_color=const.BUTTON_PRIMARY_BG,
         text_color=const.BUTTON_PRIMARY_TEXT,
         command=lambda: import_from_csv(),
+        hover_color=const.BUTTON_PRIMARY_HOVER,
     )
     create_Button.grid(row=0, column=1)
 
@@ -849,7 +903,6 @@ def import_cards(deck, app):
 def export_cards(deck, app):
     def cancel():
         export_TopUp.destroy()
-        export_TopUp.update()
 
     def import_from_csv():
         name = fileName_Entry.get()
@@ -858,7 +911,6 @@ def export_cards(deck, app):
         save_deck(deck["id"], name, path)
 
         export_TopUp.destroy()
-        export_TopUp.update()
 
         editor_cards(app, deck, True)
 
@@ -878,7 +930,10 @@ def export_cards(deck, app):
     header_Frame.columnconfigure(1, weight=0)
 
     header_Label = ctk.CTkLabel(
-        header_Frame, text="Экспорт в CSV", font=("Inter", 16, "bold")
+        header_Frame,
+        text="Экспорт в CSV",
+        font=("Inter", 16, "bold"),
+        text_color=const.TEXT_PRIMARY,
     )
     header_Label.grid(row=0, column=0, sticky="W")
 
@@ -890,6 +945,8 @@ def export_cards(deck, app):
         font=("Inter", 16, "bold"),
         fg_color="transparent",
         command=lambda: cancel(),
+        text_color=const.TEXT_PRIMARY,
+        hover_color=const.COLOR_BORDER,
     )
     header_Button.grid(row=0, column=1, sticky="E")
 
@@ -899,7 +956,10 @@ def export_cards(deck, app):
     fileName_Frame.columnconfigure(0, weight=1)
 
     fileName_Label = ctk.CTkLabel(
-        fileName_Frame, text="Название файла", font=("Inter", 16, "bold")
+        fileName_Frame,
+        text="Название файла",
+        font=("Inter", 16, "bold"),
+        text_color=const.TEXT_PRIMARY,
     )
     fileName_Label.grid(row=0, column=0, sticky="W")
 
@@ -921,7 +981,10 @@ def export_cards(deck, app):
     path_Frame.grid(row=2, column=0, padx=15, pady=10, sticky="EW")
 
     path_Label = ctk.CTkLabel(
-        path_Frame, text="Путь для сохранения", font=("Inter", 16, "bold")
+        path_Frame,
+        text="Путь для сохранения",
+        font=("Inter", 16, "bold"),
+        text_color=const.TEXT_PRIMARY,
     )
     path_Label.grid(row=0, column=0, sticky="W")
 
@@ -955,6 +1018,8 @@ def export_cards(deck, app):
         height=50,
         width=93,
         command=lambda: choose_filepath(),
+        text_color=const.TEXT_PRIMARY,
+        hover_color=const.BUTTON_SECONDARY_HOVER,
     )
     path_Button.grid(row=0, column=1, sticky="E")
 
@@ -972,6 +1037,7 @@ def export_cards(deck, app):
         fg_color=const.BUTTON_SECONDARY_BG,
         text_color=const.BUTTON_SECONDARY_TEXT,
         command=lambda: cancel(),
+        hover_color=const.BUTTON_SECONDARY_HOVER,
     )
     cancel_Button.grid(row=0, column=0, padx=10)
 
@@ -985,6 +1051,7 @@ def export_cards(deck, app):
         fg_color=const.BUTTON_PRIMARY_BG,
         text_color=const.BUTTON_PRIMARY_TEXT,
         command=lambda: import_from_csv(),
+        hover_color=const.BUTTON_PRIMARY_HOVER,
     )
     create_Button.grid(row=0, column=1)
 
@@ -994,7 +1061,6 @@ def export_cards(deck, app):
 def create_card(deck, app) -> None:
     def cancel():
         createCard_TopUp.destroy()
-        createCard_TopUp.update()
 
     def create():
         question = (question_Textbox.get("0.0", ctk.END)).strip("\n")
@@ -1013,7 +1079,6 @@ def create_card(deck, app) -> None:
         _create_card(deck["id"], question, answer)
 
         createCard_TopUp.destroy()
-        createCard_TopUp.update()
 
         editor_cards(app, deck, True)
 
@@ -1034,7 +1099,10 @@ def create_card(deck, app) -> None:
     header_Frame.columnconfigure(1, weight=0)
 
     header_Label = ctk.CTkLabel(
-        header_Frame, text="Создать карточку", font=("Inter", 16, "bold")
+        header_Frame,
+        text="Создать карточку",
+        font=("Inter", 16, "bold"),
+        text_color=const.TEXT_PRIMARY,
     )
     header_Label.grid(row=0, column=0, sticky="W")
 
@@ -1046,6 +1114,8 @@ def create_card(deck, app) -> None:
         font=("Inter", 16, "bold"),
         fg_color="transparent",
         command=lambda: cancel(),
+        text_color=const.TEXT_PRIMARY,
+        hover_color=const.COLOR_BORDER,
     )
     header_Button.grid(row=0, column=1, sticky="E")
 
@@ -1056,7 +1126,10 @@ def create_card(deck, app) -> None:
     question_Frame.columnconfigure(0, weight=1)
 
     question_Label = ctk.CTkLabel(
-        question_Frame, text="Вопрос", font=("Inter", 14, "bold")
+        question_Frame,
+        text="Вопрос",
+        font=("Inter", 14, "bold"),
+        text_color=const.TEXT_PRIMARY,
     )
     question_Label.grid(row=0, column=0, sticky="W", pady=(0, 7))
 
@@ -1078,7 +1151,12 @@ def create_card(deck, app) -> None:
     answer_Frame.rowconfigure((0, 1), weight=1)
     answer_Frame.columnconfigure(0, weight=1)
 
-    answer_Label = ctk.CTkLabel(answer_Frame, text="Ответ", font=("Inter", 14, "bold"))
+    answer_Label = ctk.CTkLabel(
+        answer_Frame,
+        text="Ответ",
+        font=("Inter", 14, "bold"),
+        text_color=const.TEXT_PRIMARY,
+    )
     answer_Label.grid(row=0, column=0, sticky="W", pady=(0, 7))
 
     answer_Textbox = ctk.CTkTextbox(
@@ -1107,6 +1185,7 @@ def create_card(deck, app) -> None:
         fg_color=const.BUTTON_SECONDARY_BG,
         text_color=const.BUTTON_SECONDARY_TEXT,
         command=lambda: cancel(),
+        hover_color=const.BUTTON_SECONDARY_HOVER,
     )
     cancel_Button.grid(row=0, column=0, padx=10)
 
@@ -1120,6 +1199,7 @@ def create_card(deck, app) -> None:
         fg_color=const.BUTTON_PRIMARY_BG,
         text_color=const.BUTTON_PRIMARY_TEXT,
         command=lambda: create(),
+        hover_color=const.BUTTON_PRIMARY_HOVER,
     )
     create_Button.grid(row=0, column=1)
 
@@ -1129,7 +1209,6 @@ def create_card(deck, app) -> None:
 def settings_card(card, deck, app):
     def cancel():
         cardSettings_TopUp.destroy()
-        cardSettings_TopUp.update()
 
     def update():
         card_id = card["id"]
@@ -1145,7 +1224,6 @@ def settings_card(card, deck, app):
         _update_card(card_id, new_question, new_answer, new_deck_id)
 
         cardSettings_TopUp.destroy()
-        cardSettings_TopUp.update()
 
         editor_cards(app, deck, True)
 
@@ -1172,7 +1250,10 @@ def settings_card(card, deck, app):
     header_Frame.columnconfigure(1, weight=0)
 
     header_Label = ctk.CTkLabel(
-        header_Frame, text="Настройки карточки", font=("Inter", 16, "bold")
+        header_Frame,
+        text="Настройки карточки",
+        font=("Inter", 16, "bold"),
+        text_color=const.TEXT_PRIMARY,
     )
     header_Label.grid(row=0, column=0, sticky="W")
 
@@ -1184,6 +1265,8 @@ def settings_card(card, deck, app):
         font=("Inter", 16, "bold"),
         fg_color="transparent",
         command=lambda: cancel(),
+        text_color=const.TEXT_PRIMARY,
+        hover_color=const.COLOR_BORDER,
     )
     header_Button.grid(row=0, column=1, sticky="E")
 
@@ -1191,7 +1274,9 @@ def settings_card(card, deck, app):
     question_Frame = ctk.CTkFrame(cardSettings_TopUp, fg_color=const.COLOR_BG)
     question_Frame.grid(row=1, column=0, padx=15, pady=10, sticky="EW")
 
-    question_Label = ctk.CTkLabel(question_Frame, text="Вопрос", font=("Inter", 14))
+    question_Label = ctk.CTkLabel(
+        question_Frame, text="Вопрос", font=("Inter", 14), text_color=const.TEXT_PRIMARY
+    )
     question_Label.grid(row=0, column=0, sticky="W", pady=(0, 10))
 
     question_Textbox = ctk.CTkTextbox(
@@ -1210,7 +1295,9 @@ def settings_card(card, deck, app):
     answer_Frame = ctk.CTkFrame(cardSettings_TopUp, fg_color=const.COLOR_BG)
     answer_Frame.grid(row=2, column=0, padx=15, sticky="EW")
 
-    answer_Label = ctk.CTkLabel(answer_Frame, text="Ответ", font=("Inter", 14))
+    answer_Label = ctk.CTkLabel(
+        answer_Frame, text="Ответ", font=("Inter", 14), text_color=const.TEXT_PRIMARY
+    )
     answer_Label.grid(row=0, column=0, sticky="W", pady=(0, 10))
 
     answer_Textbox = ctk.CTkTextbox(
@@ -1231,7 +1318,9 @@ def settings_card(card, deck, app):
     )
     deck_Frame.grid(row=3, column=0, padx=5, pady=10, sticky="EW")
 
-    deck_Label = ctk.CTkLabel(deck_Frame, text="Колода", font=("Inter", 14))
+    deck_Label = ctk.CTkLabel(
+        deck_Frame, text="Колода", font=("Inter", 14), text_color=const.TEXT_PRIMARY
+    )
     deck_Label.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="W")
 
     optionMenu_var = ctk.StringVar(value=deck_name)
@@ -1265,6 +1354,7 @@ def settings_card(card, deck, app):
         fg_color=const.BUTTON_SECONDARY_BG,
         text_color=const.BUTTON_SECONDARY_TEXT,
         command=lambda: cancel(),
+        hover_color=const.BUTTON_SECONDARY_HOVER,
     )
     cancel_Button.grid(row=0, column=0, padx=10)
 
@@ -1278,6 +1368,7 @@ def settings_card(card, deck, app):
         fg_color=const.BUTTON_PRIMARY_BG,
         text_color=const.BUTTON_PRIMARY_TEXT,
         command=lambda: update(),
+        hover_color=const.BUTTON_PRIMARY_HOVER,
     )
     save_Button.grid(row=0, column=1)
 
@@ -1288,13 +1379,11 @@ def settings_card(card, deck, app):
 def delete_card(card, deck, app):
     def cancel():
         confirmation_TopUp.destroy()
-        confirmation_TopUp.update()
 
     def delete():
         _delete_card(card["id"])
 
         confirmation_TopUp.destroy()
-        confirmation_TopUp.update()
 
         editor_cards(app, deck, True)
 
@@ -1314,7 +1403,10 @@ def delete_card(card, deck, app):
     header_Frame.columnconfigure(1, weight=0)
 
     header_Label = ctk.CTkLabel(
-        header_Frame, text="Удалить карточку", font=("Inter", 16, "bold")
+        header_Frame,
+        text="Удалить карточку",
+        font=("Inter", 16, "bold"),
+        text_color=const.TEXT_PRIMARY,
     )
     header_Label.grid(row=0, column=0, sticky="W")
 
@@ -1326,6 +1418,8 @@ def delete_card(card, deck, app):
         font=("Inter", 16, "bold"),
         fg_color="transparent",
         command=lambda: cancel(),
+        text_color=const.TEXT_PRIMARY,
+        hover_color=const.COLOR_BORDER,
     )
     header_Button.grid(row=0, column=1, sticky="E")
 
@@ -1336,6 +1430,7 @@ def delete_card(card, deck, app):
         wraplength=450,
         anchor="w",
         justify="left",
+        text_color=const.TEXT_PRIMARY,
     )
     confirmation_Label.grid(row=1, column=0, padx=15, pady=(10, 0), sticky="EW")
 
@@ -1353,6 +1448,7 @@ def delete_card(card, deck, app):
         fg_color=const.BUTTON_SECONDARY_BG,
         text_color=const.BUTTON_SECONDARY_TEXT,
         command=lambda: cancel(),
+        hover_color=const.BUTTON_SECONDARY_HOVER,
     )
     cancel_Button.grid(row=0, column=0, padx=10)
 
@@ -1366,6 +1462,7 @@ def delete_card(card, deck, app):
         fg_color=const.BUTTON_CONFIRM_BG,
         text_color=const.BUTTON_CONFIRM_TEXT,
         command=lambda: delete(),
+        hover_color=const.BUTTON_CONFIRM_BG_HOVER,
     )
     delete_Button.grid(row=0, column=1)
 

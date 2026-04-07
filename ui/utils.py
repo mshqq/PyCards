@@ -19,7 +19,8 @@ def alert(app, suffix=None, on_close=None):
 
     msg = f"Ошибка: {suffix}" if suffix else ""
 
-    label = customtkinter.CTkLabel(alert_window, text=msg, font=("Inter", 16, "bold"))
+    label = customtkinter.CTkLabel(alert_window, text=msg, font=("Inter", 16, "bold"),
+        text_color=const.TEXT_PRIMARY)
     label.grid(row=0, column=1, sticky="EW")
     close_btn = customtkinter.CTkButton(
         alert_window,
@@ -27,7 +28,9 @@ def alert(app, suffix=None, on_close=None):
         command=close,
         font=("Inter", 14),
         fg_color=const.BUTTON_PRIMARY_BG,
-    )
+    
+        text_color=const.TEXT_PRIMARY,
+        hover_color=const.BUTTON_PRIMARY_HOVER)
     close_btn.grid(row=1, column=1)
     alert_window.after(100, alert_window.lift)
 
@@ -35,20 +38,18 @@ def alert(app, suffix=None, on_close=None):
 def confirm(object, type, app, on_yes=None, on_no=None):
     def yes():
         confirm_window.destroy()
-        confirm_window.update()
         if on_yes:
             on_yes()
 
     def no():
         confirm_window.destroy()
-        confirm_window.update()
         if on_no:
             on_no()
 
     confirm_window = customtkinter.CTkToplevel(app)
     confirm_window.title("Подтверждение")
     confirm_window.geometry("600x150")
-    confirm_window.configure(fg_color="#18181A")
+    confirm_window.configure(fg_color=const.COLOR_BG)
     confirm_window.resizable(False, False)
     confirm_window.rowconfigure((0, 2), weight=1)
     confirm_window.rowconfigure(1, weight=0)
@@ -69,10 +70,11 @@ def confirm(object, type, app, on_yes=None, on_no=None):
         confirm_window,
         text=text,
         font=("Inter", 16, "bold"),
-    )
+    
+        text_color=const.TEXT_PRIMARY,)
     label.grid(row=0, column=0, columnspan=3, sticky="EW")
 
-    buttons = customtkinter.CTkFrame(confirm_window, fg_color="#18181A")
+    buttons = customtkinter.CTkFrame(confirm_window, fg_color=const.COLOR_BG)
     buttons.grid(row=1, column=0, sticky="EW", columnspan=3)
     buttons.rowconfigure(0, weight=1)
     buttons.columnconfigure((0, 2), weight=1)
@@ -83,9 +85,9 @@ def confirm(object, type, app, on_yes=None, on_no=None):
         text="Да",
         command=yes,
         font=("Rubik", 14),
-        fg_color="#3F3F46",
-        text_color="#FFFFFF",
-    )
+        fg_color=const.BUTTON_SECONDARY_BG,
+        text_color=const.TEXT_PRIMARY,
+        hover_color=const.BUTTON_SECONDARY_HOVER)
     yes_btn.grid(row=0, column=0, sticky="E", padx=20)
 
     no_btn = customtkinter.CTkButton(
@@ -93,9 +95,9 @@ def confirm(object, type, app, on_yes=None, on_no=None):
         text="Нет",
         command=no,
         font=("Rubik", 14),
-        fg_color="#3F3F46",
-        text_color="#FFFFFF",
-    )
+        fg_color=const.BUTTON_SECONDARY_BG,
+        text_color=const.TEXT_PRIMARY,
+        hover_color=const.BUTTON_SECONDARY_HOVER)
     no_btn.grid(row=0, column=1, sticky="W", padx=20)
 
     confirm_window.after(100, confirm_window.lift)

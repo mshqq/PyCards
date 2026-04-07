@@ -1,16 +1,14 @@
 # Окно просмотра
 # Основное окно
-from card_model import _update_card_sm2
 from scheduler import calculate_next
-from card_model import _get_cards_for_review
-from card_model import _get_cards_by_deck
+from card_model import _get_cards_for_review, _get_cards_by_deck, _update_card_sm2
 from deck_model import _get_decks_with_counts
 from ui import main_window
 from ui.utils import alert
-from PIL import Image
-
-import customtkinter as ctk
 import ui.constants as const
+
+from PIL import Image
+import customtkinter as ctk
 
 IMG_ARROW = ctk.CTkImage(Image.open("icons/arrow.png"), size=(16, 12))
 
@@ -47,16 +45,18 @@ def select_Window(app):
         width=30,
         height=30,
         fg_color="transparent",
-        hover_color="#27272A",
+        hover_color=const.COLOR_BORDER,
         command=lambda: back(),
         font=("Inter", 18, "bold"),
-    )
+    
+        text_color=const.TEXT_PRIMARY,)
     back_Button.grid(row=0, column=0, sticky="W", padx=10)
 
     # Заголовок "Выбор колоды"
     header_Label = ctk.CTkLabel(
         master=header_Frame, text="Выбор колоды", font=("Inter", 24, "bold")
-    )
+    ,
+        text_color=const.TEXT_PRIMARY)
     header_Label.grid(row=0, column=1, sticky="W")
 
     decks_Frame = ctk.CTkScrollableFrame(
@@ -64,7 +64,7 @@ def select_Window(app):
         width=760,
         height=500,
         fg_color=const.COLOR_BG,
-        scrollbar_button_color="#303037",
+        scrollbar_button_color=const.SCROLLBAR_BG,
     )
     decks_Frame.grid(row=1, column=0, sticky="EW", padx=20)
     decks_Frame.columnconfigure((0, 1, 2), weight=1)
@@ -99,7 +99,8 @@ def select_Window(app):
                 text=deck["name"],
                 font=("Inter", 14, "bold"),
                 anchor="w",
-            )
+            
+        text_color=const.TEXT_PRIMARY,)
             name_Label.grid(row=0, column=0, padx=(15, 10), pady=(10, 0), sticky="W")
 
             stats_Frame = ctk.CTkFrame(
@@ -119,7 +120,8 @@ def select_Window(app):
                 text=f"Всего карточек: {countCards}",
                 font=("Inter", 14),
                 fg_color=const.FRAME_BG,
-            )
+            
+        text_color=const.TEXT_PRIMARY,)
             countCards_Label.grid(row=0, column=0, sticky="W", pady=0)
 
             toLearnCards = len(_get_cards_for_review(deck["id"]))
@@ -129,7 +131,8 @@ def select_Window(app):
                 text=f"К повторению: {toLearnCards}",
                 font=("Inter", 14),
                 fg_color=const.FRAME_BG,
-            )
+            
+        text_color=const.TEXT_PRIMARY,)
             toLearnCards_Label.grid(row=1, column=0, sticky="W")
 
             buttons_Frame = ctk.CTkFrame(deck_Frame, fg_color=const.FRAME_BG)
@@ -146,7 +149,9 @@ def select_Window(app):
                 corner_radius=15,
                 fg_color=const.BUTTON_PRIMARY_BG,
                 command=lambda deck=deck: learning_Window(app, deck),
-            )
+            
+        text_color=const.TEXT_PRIMARY,
+        hover_color=const.BUTTON_PRIMARY_HOVER)
             learning_Button.grid(row=0, column=0, padx=(0, 6))
 
             view_Button = ctk.CTkButton(
@@ -158,7 +163,9 @@ def select_Window(app):
                 corner_radius=15,
                 fg_color=const.BUTTON_SECONDARY_BG,
                 command=lambda deck=deck: viewer_Window(app, deck),
-            )
+            
+        text_color=const.TEXT_PRIMARY,
+        hover_color=const.BUTTON_SECONDARY_HOVER)
             view_Button.grid(row=0, column=1, padx=(6, 0))
 
 
@@ -175,7 +182,7 @@ def learning_Window(app, deck):
         goodMark_Button,
         easyMark_Button,
     ):
-        answer_Label.configure(text_color="#FFF")
+        answer_Label.configure(text_color=const.TEXT_PRIMARY)
         showAnswer_Button.grid_forget()
 
         buttons_Frame.grid(row=2, column=0, pady=25)
@@ -185,7 +192,7 @@ def learning_Window(app, deck):
         goodMark_Button.grid(row=0, column=2, padx=(0, 10))
         easyMark_Button.grid(row=0, column=3, padx=(0, 10))
 
-    def send_feedback(pointer, card, mark):
+    def send_feedback(cards_for_review, card, pointer, repeated, mark):
         interval = card["interval"]
         repetitions = card["repetitions"]
 
@@ -193,10 +200,15 @@ def learning_Window(app, deck):
             interval, repetitions, mark
         )
         _update_card_sm2(card["id"], new_interval, new_repetitions, next_review_iso)
-        pointer += 1
-        render(cards_for_review, pointer)
 
-    def render(cards_for_review, pointer):
+        if mark == "bad":
+            cards_for_review.append(card)
+            render(cards_for_review, pointer + 1, repeated)
+            return
+
+        render(cards_for_review, pointer + 1, repeated + 1)
+
+    def render(cards_for_review, pointer, repeated):
         try:
             current_card = cards_for_review[pointer]
         except IndexError:
@@ -238,10 +250,11 @@ def learning_Window(app, deck):
             width=30,
             height=30,
             fg_color="transparent",
-            hover_color="#27272A",
+            hover_color=const.COLOR_BORDER,
             command=lambda: back(),
             font=("Inter", 18, "bold"),
-        )
+        
+        text_color=const.TEXT_PRIMARY,)
         back_button.grid(row=0, column=0, sticky="W", padx=10)
 
         # Статистика "Режим просмотра: 1/2"
@@ -249,7 +262,7 @@ def learning_Window(app, deck):
             header_Frame,
             height=30,
             width=190,
-            fg_color="#1F1F22",
+            fg_color=const.STATS_FRAME_BG,
             border_width=1,
             border_color=const.FRAME_BORDER,
             corner_radius=15,
@@ -259,18 +272,19 @@ def learning_Window(app, deck):
         stats_Frame.rowconfigure(0, weight=1)
         stats_Frame.grid_propagate(False)
 
-        msg = f"Осталось: {len(cards_for_review) - pointer} / Повторено: {pointer}"
+        msg = f"Осталось: {len(cards_for_review) - pointer} / Повторено: {repeated}"
 
         stats_Label = ctk.CTkLabel(
             master=stats_Frame,
             text=msg,
             font=("Inter", 12, "bold"),
-        )
+        
+        text_color=const.TEXT_PRIMARY,)
         stats_Label.grid(row=0, column=0)
 
         question_Frame = ctk.CTkFrame(
             app,
-            fg_color="#242427",
+            fg_color=const.FRAME_BG,
             height=453,
             width=600,
             border_width=2,
@@ -286,7 +300,8 @@ def learning_Window(app, deck):
             question_Frame,
             text=current_card["question"],
             font=("Inter", 16, "bold"),
-        )
+        
+        text_color=const.TEXT_PRIMARY,)
         question_Label.grid(row=0, column=0, pady=(140, 40))
 
         answer_Label = ctk.CTkLabel(
@@ -314,7 +329,9 @@ def learning_Window(app, deck):
                 goodMark_Button,
                 easyMark_Button,
             ),
-        )
+        
+        text_color=const.TEXT_PRIMARY,
+        hover_color=const.BUTTON_PRIMARY_HOVER)
         showAnswer_Button.grid(row=2, column=0, pady=25)
 
         buttons_Frame = ctk.CTkFrame(app, fg_color=const.COLOR_BG)
@@ -330,8 +347,10 @@ def learning_Window(app, deck):
             border_width=2,
             border_color=const.BUTTON_DELETE_TEXT,
             text_color=const.BUTTON_DELETE_TEXT,
-            command=lambda: send_feedback(pointer, current_card, "bad"),
-        )
+            command=lambda: send_feedback(
+                cards_for_review, current_card, pointer, repeated, "bad"
+            ),
+        hover_color=const.BUTTON_DELETE_HOVER)
 
         normalMark_Button = ctk.CTkButton(
             buttons_Frame,
@@ -344,39 +363,46 @@ def learning_Window(app, deck):
             border_width=2,
             border_color=const.FRAME_BORDER,
             text_color=const.BUTTON_SECONDARY_TEXT,
-            command=lambda: send_feedback(pointer, current_card, "normal"),
-        )
+            command=lambda: send_feedback(
+                cards_for_review, current_card, pointer, repeated, "normal"
+            ),
+        hover_color=const.FRAME_BG_HOVER)
 
         goodMark_Button = ctk.CTkButton(
             buttons_Frame,
             font=("Inter", 14, "bold"),
-            fg_color="#162923",
+            fg_color=const.BUTTON_GOOD_BG,
             text="Хорошо",
             height=38,
             width=140,
             corner_radius=15,
             border_width=2,
-            border_color="#124234",
-            text_color="#00D18F",
-            command=lambda: send_feedback(pointer, current_card, "good"),
-        )
+            border_color=const.BUTTON_GOOD_BORDER,
+            text_color=const.BUTTON_GOOD_TEXT,
+            command=lambda: send_feedback(
+                cards_for_review, current_card, pointer, repeated, "good"
+            ),
+        hover_color=const.BUTTON_GOOD_BG_HOVER)
         easyMark_Button = ctk.CTkButton(
             buttons_Frame,
             font=("Inter", 14, "bold"),
-            fg_color="#1A2331",
+            fg_color=const.BUTTON_EASY_BG,
             text="Легко",
             height=38,
             width=140,
             corner_radius=15,
             border_width=2,
-            border_color="#1D355C",
-            text_color="#3D94FF",
-            command=lambda: send_feedback(pointer, current_card, "easy"),
-        )
+            border_color=const.BUTTON_EASY_BORDER,
+            text_color=const.BUTTON_EASY_TEXT,
+            command=lambda: send_feedback(
+                cards_for_review, current_card, pointer, repeated, "easy"
+            ),
+        hover_color=const.BUTTON_EASY_BG_HOVER)
 
     cards_for_review = _get_cards_for_review(deck["id"])
     pointer = 0
-    render(cards_for_review, pointer)
+    repeated = 0
+    render(cards_for_review, pointer, repeated)
 
 
 def viewer_Window(app, deck):
@@ -392,7 +418,7 @@ def viewer_Window(app, deck):
         render(pointer)
 
     def showAnswer(answer_Label, showAnswer_Button):
-        answer_Label.configure(text_color="#FFF")
+        answer_Label.configure(text_color=const.TEXT_PRIMARY)
         showAnswer_Button.configure(
             state="disabled",
             fg_color=const.COLOR_BG,
@@ -435,10 +461,11 @@ def viewer_Window(app, deck):
             width=30,
             height=30,
             fg_color="transparent",
-            hover_color="#27272A",
+            hover_color=const.COLOR_BORDER,
             command=lambda: back(),
             font=("Inter", 18, "bold"),
-        )
+        
+        text_color=const.TEXT_PRIMARY,)
         back_button.grid(row=0, column=0, sticky="W", padx=10)
 
         # # Статистика "Режим просмотра: 1/2"
@@ -446,7 +473,7 @@ def viewer_Window(app, deck):
             header_Frame,
             height=30,
             width=161,
-            fg_color="#1F1F22",
+            fg_color=const.STATS_FRAME_BG,
             border_width=1,
             border_color=const.FRAME_BORDER,
             corner_radius=15,
@@ -462,12 +489,13 @@ def viewer_Window(app, deck):
             master=stats_Frame,
             text=msg,
             font=("Inter", 12, "bold"),
-        )
+        
+        text_color=const.TEXT_PRIMARY,)
         stats_Label.grid(row=0, column=0)
 
         question_Frame = ctk.CTkFrame(
             app,
-            fg_color="#242427",
+            fg_color=const.FRAME_BG,
             height=453,
             width=600,
             border_width=2,
@@ -483,7 +511,8 @@ def viewer_Window(app, deck):
             question_Frame,
             text=current_card["question"],
             font=("Inter", 16, "bold"),
-        )
+        
+        text_color=const.TEXT_PRIMARY,)
         question_Label.grid(row=0, column=0, pady=(140, 40))
 
         answer_Label = ctk.CTkLabel(
@@ -510,7 +539,9 @@ def viewer_Window(app, deck):
             corner_radius=15,
             text="Назад",
             command=lambda: go_prev(pointer),
-        )
+        
+        text_color=const.TEXT_PRIMARY,
+        hover_color=const.BUTTON_SECONDARY_HOVER)
         prev_Button.grid(row=0, column=0)
         showAnswer_Button = ctk.CTkButton(
             buttons_Frame,
@@ -521,7 +552,9 @@ def viewer_Window(app, deck):
             corner_radius=15,
             text="Показать ответ",
             command=lambda: showAnswer(answer_Label, showAnswer_Button),
-        )
+        
+        text_color=const.TEXT_PRIMARY,
+        hover_color=const.BUTTON_PRIMARY_HOVER)
         showAnswer_Button.grid(row=0, column=1, padx=110)
         next_Button = ctk.CTkButton(
             buttons_Frame,
@@ -532,7 +565,9 @@ def viewer_Window(app, deck):
             corner_radius=15,
             text="Вперед",
             command=lambda: go_next(pointer),
-        )
+        
+        text_color=const.TEXT_PRIMARY,
+        hover_color=const.BUTTON_SECONDARY_HOVER)
         next_Button.grid(row=0, column=2)
 
     all_cards = _get_cards_by_deck(deck["id"])

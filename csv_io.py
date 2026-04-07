@@ -58,11 +58,9 @@ def load_deck(filename, encoding, deck_name=None) -> tuple[int, int] | None:
         return cards_added, cards_skipped
 
     except FileNotFoundError:
-        print(f"Ошибка: Файл {filename} не найден.")
+        raise
     except UnicodeDecodeError:
-        print(
-            f"Ошибка: Не удалось прочитать файл в кодировке {encoding}. Попробуйте 'UTF-8' или 'CP1251'."
-        )
+        raise
 
 
 def save_deck(deck_id, filename, path):

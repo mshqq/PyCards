@@ -7,7 +7,6 @@ from ui import main_window
 def main() -> None:
     init_db()
 
-    print("БД инициализирована.")
 
     ctk.deactivate_automatic_dpi_awareness()
     ctk.set_appearance_mode("dark")
@@ -26,5 +25,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    print("PyCards запускается...")
     main()
