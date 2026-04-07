@@ -2,10 +2,11 @@ import customtkinter
 import ui.constants as const
 
 
-def alert(app, suffix=None):
+def alert(app, suffix=None, on_close=None):
     def close():
         alert_window.destroy()
-        alert_window.update()
+        if on_close:
+            on_close()
 
     alert_window = customtkinter.CTkToplevel(app)
     alert_window.title("Ошибка!")
@@ -18,13 +19,13 @@ def alert(app, suffix=None):
 
     msg = f"Ошибка: {suffix}" if suffix else ""
 
-    label = customtkinter.CTkLabel(alert_window, text=msg, font=("Rubik", 16, "bold"))
+    label = customtkinter.CTkLabel(alert_window, text=msg, font=("Inter", 16, "bold"))
     label.grid(row=0, column=1, sticky="EW")
     close_btn = customtkinter.CTkButton(
         alert_window,
         text="Закрыть окно",
         command=close,
-        font=("Rubik", 14),
+        font=("Inter", 14),
         fg_color=const.BUTTON_PRIMARY_BG,
     )
     close_btn.grid(row=1, column=1)

@@ -1,9 +1,12 @@
 # Окно просмотра
 # Основное окно
+from card_model import _update_card_sm2
+from scheduler import calculate_next
 from card_model import _get_cards_for_review
 from card_model import _get_cards_by_deck
 from deck_model import _get_decks_with_counts
 from ui import main_window
+from ui.utils import alert
 from PIL import Image
 
 import customtkinter as ctk
@@ -160,7 +163,220 @@ def select_Window(app):
 
 
 def learning_Window(app, deck):
-    pass
+    def back():
+        select_Window(app)
+
+    def showAnswer(
+        answer_Label,
+        showAnswer_Button,
+        buttons_Frame,
+        badMark_Button,
+        normalMark_Button,
+        goodMark_Button,
+        easyMark_Button,
+    ):
+        answer_Label.configure(text_color="#FFF")
+        showAnswer_Button.grid_forget()
+
+        buttons_Frame.grid(row=2, column=0, pady=25)
+        buttons_Frame.columnconfigure((0, 1, 2, 3), weight=1)
+        badMark_Button.grid(row=0, column=0, padx=(0, 10))
+        normalMark_Button.grid(row=0, column=1, padx=(0, 10))
+        goodMark_Button.grid(row=0, column=2, padx=(0, 10))
+        easyMark_Button.grid(row=0, column=3, padx=(0, 10))
+
+    def send_feedback(pointer, card, mark):
+        interval = card["interval"]
+        repetitions = card["repetitions"]
+
+        new_interval, new_repetitions, next_review_iso = calculate_next(
+            interval, repetitions, mark
+        )
+        _update_card_sm2(card["id"], new_interval, new_repetitions, next_review_iso)
+        pointer += 1
+        render(cards_for_review, pointer)
+
+    def render(cards_for_review, pointer):
+        try:
+            current_card = cards_for_review[pointer]
+        except IndexError:
+            if pointer != 0:
+                alert(
+                    app,
+                    "Карточки к обучению закончились.",
+                    on_close=lambda: select_Window(app),
+                )
+                return
+            alert(app, "Карточек к обучению нет", on_close=lambda: select_Window(app))
+            return
+
+        app.configure(fg_color=const.COLOR_BG)
+        app.title("PyCards - обучение")
+
+        for widget in app.winfo_children():
+            widget.destroy()
+
+        for i in range(8):
+            app.grid_rowconfigure(i, weight=0)
+        app.grid_columnconfigure(0, weight=1)
+        app.grid_rowconfigure((0, 1, 2), weight=0)
+
+        # header_frame
+        header_Frame = ctk.CTkFrame(
+            master=app, height=38, width=740, fg_color=const.COLOR_BG
+        )
+        header_Frame.grid(row=0, column=0, pady=15, sticky="EW", padx=20)
+        header_Frame.rowconfigure(0, weight=1)
+        header_Frame.columnconfigure((0, 1, 2), weight=1)
+        header_Frame.columnconfigure(0, weight=0)
+
+        # Кнопка "Назад"
+        back_button = ctk.CTkButton(
+            master=header_Frame,
+            image=IMG_ARROW,
+            text="",
+            width=30,
+            height=30,
+            fg_color="transparent",
+            hover_color="#27272A",
+            command=lambda: back(),
+            font=("Inter", 18, "bold"),
+        )
+        back_button.grid(row=0, column=0, sticky="W", padx=10)
+
+        # Статистика "Режим просмотра: 1/2"
+        stats_Frame = ctk.CTkFrame(
+            header_Frame,
+            height=30,
+            width=190,
+            fg_color="#1F1F22",
+            border_width=1,
+            border_color=const.FRAME_BORDER,
+            corner_radius=15,
+        )
+        stats_Frame.grid(row=0, column=1, columnspan=2, sticky="E")
+        stats_Frame.columnconfigure(0, weight=1)
+        stats_Frame.rowconfigure(0, weight=1)
+        stats_Frame.grid_propagate(False)
+
+        msg = f"Осталось: {len(cards_for_review) - pointer} / Повторено: {pointer}"
+
+        stats_Label = ctk.CTkLabel(
+            master=stats_Frame,
+            text=msg,
+            font=("Inter", 12, "bold"),
+        )
+        stats_Label.grid(row=0, column=0)
+
+        question_Frame = ctk.CTkFrame(
+            app,
+            fg_color="#242427",
+            height=453,
+            width=600,
+            border_width=2,
+            border_color=const.FRAME_BORDER,
+            corner_radius=15,
+        )
+        question_Frame.grid(row=1, column=0, padx=50)
+        question_Frame.columnconfigure(0, weight=1)
+        question_Frame.rowconfigure(1, weight=0)
+        question_Frame.grid_propagate(False)
+
+        question_Label = ctk.CTkLabel(
+            question_Frame,
+            text=current_card["question"],
+            font=("Inter", 16, "bold"),
+        )
+        question_Label.grid(row=0, column=0, pady=(140, 40))
+
+        answer_Label = ctk.CTkLabel(
+            question_Frame,
+            text=current_card["answer"],
+            font=("Inter", 14),
+            text_color=const.FRAME_BG,
+        )
+        answer_Label.grid(row=1, column=0)
+
+        showAnswer_Button = ctk.CTkButton(
+            app,
+            text="Показать ответ",
+            font=("Inter", 14, "bold"),
+            corner_radius=15,
+            height=38,
+            width=280,
+            fg_color=const.BUTTON_PRIMARY_BG,
+            command=lambda: showAnswer(
+                answer_Label,
+                showAnswer_Button,
+                buttons_Frame,
+                badMark_Button,
+                normalMark_Button,
+                goodMark_Button,
+                easyMark_Button,
+            ),
+        )
+        showAnswer_Button.grid(row=2, column=0, pady=25)
+
+        buttons_Frame = ctk.CTkFrame(app, fg_color=const.COLOR_BG)
+
+        badMark_Button = ctk.CTkButton(
+            buttons_Frame,
+            font=("Inter", 14, "bold"),
+            fg_color=const.BUTTON_DELETE_BG,
+            text="Плохо",
+            height=38,
+            width=140,
+            corner_radius=15,
+            border_width=2,
+            border_color=const.BUTTON_DELETE_TEXT,
+            text_color=const.BUTTON_DELETE_TEXT,
+            command=lambda: send_feedback(pointer, current_card, "bad"),
+        )
+
+        normalMark_Button = ctk.CTkButton(
+            buttons_Frame,
+            font=("Inter", 14, "bold"),
+            fg_color=const.FRAME_BG,
+            text="Нормально",
+            height=38,
+            width=140,
+            corner_radius=15,
+            border_width=2,
+            border_color=const.FRAME_BORDER,
+            text_color=const.BUTTON_SECONDARY_TEXT,
+            command=lambda: send_feedback(pointer, current_card, "normal"),
+        )
+
+        goodMark_Button = ctk.CTkButton(
+            buttons_Frame,
+            font=("Inter", 14, "bold"),
+            fg_color="#162923",
+            text="Хорошо",
+            height=38,
+            width=140,
+            corner_radius=15,
+            border_width=2,
+            border_color="#124234",
+            text_color="#00D18F",
+            command=lambda: send_feedback(pointer, current_card, "good"),
+        )
+        easyMark_Button = ctk.CTkButton(
+            buttons_Frame,
+            font=("Inter", 14, "bold"),
+            fg_color="#1A2331",
+            text="Легко",
+            height=38,
+            width=140,
+            corner_radius=15,
+            border_width=2,
+            border_color="#1D355C",
+            text_color="#3D94FF",
+            command=lambda: send_feedback(pointer, current_card, "easy"),
+        )
+
+    cards_for_review = _get_cards_for_review(deck["id"])
+    pointer = 0
+    render(cards_for_review, pointer)
 
 
 def viewer_Window(app, deck):
@@ -177,16 +393,19 @@ def viewer_Window(app, deck):
 
     def showAnswer(answer_Label, showAnswer_Button):
         answer_Label.configure(text_color="#FFF")
-        showAnswer_Button.configure(state="disabled")
+        showAnswer_Button.configure(
+            state="disabled",
+            fg_color=const.COLOR_BG,
+            text_color=const.COLOR_BG,
+            text_color_disabled=const.COLOR_BG,
+        )
 
     def render(pointer):
-        if pointer < 0:
-            pointer = 0
-        try:
-            current_card = all_cards[pointer]
-        except IndexError:
-            pointer -= 1
-            current_card = all_cards[pointer]
+        if not all_cards:
+            alert(app, "В колоде нет карточек", on_close=lambda: back())
+            return
+        pointer = max(0, min(pointer, len(all_cards) - 1))
+        current_card = all_cards[pointer]
 
         app.configure(fg_color=const.COLOR_BG)
         app.title("PyCards - Просмотр колоды")
