@@ -53,7 +53,7 @@ def main_menu(app) -> None:
 
     info_label = ctk.CTkLabel(
         app,
-        text="v0.1 by Mshqq",
+        text="v1.0 by github.com/mshqq",
         font=("Bahnschrift", 15, "bold"),
         text_color=const.TEXT_SECONDARY,
     )
