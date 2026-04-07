@@ -7,7 +7,6 @@ from ui import main_window
 def main() -> None:
     init_db()
 
-
     ctk.deactivate_automatic_dpi_awareness()
     ctk.set_appearance_mode("dark")
     ctk.set_default_color_theme("dark-blue")

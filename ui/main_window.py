@@ -15,8 +15,9 @@ def main_menu(app) -> None:
 
     app.configure(fg_color=const.COLOR_BG)
 
-    main_Label = ctk.CTkLabel(app, text="PyCards", font=("Inter", 32, "bold"),
-        text_color=const.TEXT_PRIMARY)
+    main_Label = ctk.CTkLabel(
+        app, text="PyCards", font=("Inter", 32, "bold"), text_color=const.TEXT_PRIMARY
+    )
     main_Label.grid(row=0, column=0, sticky="nsew")
 
     buttons_Frame = ctk.CTkFrame(app, fg_color=const.COLOR_BG)
@@ -31,9 +32,9 @@ def main_menu(app) -> None:
         corner_radius=15,
         height=38,
         width=158,
-    
         text_color=const.TEXT_PRIMARY,
-        hover_color=const.BUTTON_PRIMARY_HOVER)
+        hover_color=const.BUTTON_PRIMARY_HOVER,
+    )
     learning_Button.grid(row=0, column=0, pady=(0, 15))
 
     editor_Button = ctk.CTkButton(
@@ -45,9 +46,9 @@ def main_menu(app) -> None:
         corner_radius=15,
         height=38,
         width=158,
-    
         text_color=const.TEXT_PRIMARY,
-        hover_color=const.BUTTON_SECONDARY_HOVER)
+        hover_color=const.BUTTON_SECONDARY_HOVER,
+    )
     editor_Button.grid(row=1, column=0)
 
     info_label = ctk.CTkLabel(

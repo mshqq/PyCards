@@ -24,8 +24,8 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 IMG_ARROW = ctk.CTkImage(Image.open("icons/arrow.png"), size=(16, 12))
-IMG_DELETE = ctk.CTkImage(Image.open("icons/Delete_png.png"), size=(20, 20))
-IMG_SETTINGS = ctk.CTkImage(Image.open("icons/settings-2.png"), size=(20, 20))
+IMG_DELETE = ctk.CTkImage(Image.open("icons/delete.png"), size=(20, 20))
+IMG_SETTINGS = ctk.CTkImage(Image.open("icons/settings.png"), size=(20, 20))
 
 
 # Редактор колод
