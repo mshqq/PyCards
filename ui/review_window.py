@@ -90,6 +90,7 @@ def select_Window(app):
                 column=0 + deck_index,
                 padx=10,
                 pady=(0, 15),
+                sticky="w",
             )
             deck_Frame.grid_columnconfigure(0, weight=1)
             deck_Frame.grid_rowconfigure((0, 1, 2), weight=0)
