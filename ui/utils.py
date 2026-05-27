@@ -109,6 +109,56 @@ def confirm(object, type, app, on_yes=None, on_no=None):
     confirm_window.after(100, confirm_window.lift)
 
 
+def help_dialog(app):
+    def close():
+        dialog.destroy()
+
+    dialog = customtkinter.CTkToplevel(app)
+    dialog.title("О приложении")
+    dialog.geometry("420x280")
+    dialog.resizable(False, False)
+    dialog.configure(fg_color=const.COLOR_BG)
+    dialog.rowconfigure(0, weight=1)
+    dialog.rowconfigure(1, weight=0)
+    dialog.columnconfigure(0, weight=1)
+
+    text = (
+        "PyCards — приложение для запоминания\n"
+        "с помощью интервального повторения.\n\n"
+        "Как пользоваться:\n"
+        "  • Редактор — создайте колоды и добавьте\n"
+        "    карточки с вопросом и ответом\n"
+        "  • Обучение — выберите колоду и проходите\n"
+        "    карточки одну за другой\n"
+        "  • Оцените ответ: «Легко», «Хорошо» или\n"
+        "    «Снова» — система сама назначит следующий повтор"
+    )
+
+    label = customtkinter.CTkLabel(
+        dialog,
+        text=text,
+        font=("Inter", 13),
+        text_color=const.TEXT_PRIMARY,
+        justify="left",
+    )
+    label.grid(row=0, column=0, padx=28, pady=(20, 10), sticky="W")
+
+    close_btn = customtkinter.CTkButton(
+        dialog,
+        text="Закрыть",
+        command=close,
+        font=("Inter", 14),
+        fg_color=const.BUTTON_SECONDARY_BG,
+        text_color=const.TEXT_PRIMARY,
+        hover_color=const.BUTTON_SECONDARY_HOVER,
+        corner_radius=15,
+        height=36,
+        width=130,
+    )
+    close_btn.grid(row=1, column=0, pady=(0, 20))
+    dialog.after(100, dialog.lift)
+
+
 if __name__ == "__main__":
     app = customtkinter.CTk()
     app.geometry("400x150")

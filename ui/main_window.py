@@ -51,13 +51,32 @@ def main_menu(app) -> None:
     )
     editor_Button.grid(row=1, column=0)
 
+    bottom_frame = ctk.CTkFrame(app, fg_color=const.COLOR_BG)
+    bottom_frame.grid(row=2, column=0, sticky="EW", pady=20)
+    bottom_frame.grid_columnconfigure(0, weight=1)
+    bottom_frame.grid_columnconfigure(1, weight=0)
+
     info_label = ctk.CTkLabel(
-        app,
+        bottom_frame,
         text="v1.0 by github.com/mshqq",
         font=("Bahnschrift", 15, "bold"),
         text_color=const.TEXT_SECONDARY,
     )
-    info_label.grid(row=2, column=0, pady=20)
+    info_label.grid(row=0, column=0, sticky="W", padx=20)
+
+    help_button = ctk.CTkButton(
+        bottom_frame,
+        text="?",
+        font=("Inter", 14, "bold"),
+        command=lambda: open_help(app),
+        corner_radius=15,
+        height=30,
+        width=30,
+        fg_color=const.BUTTON_SECONDARY_BG,
+        text_color=const.TEXT_PRIMARY,
+        hover_color=const.BUTTON_SECONDARY_HOVER,
+    )
+    help_button.grid(row=0, column=1, sticky="E", padx=20)
 
 
 def open_learning(app):
@@ -70,3 +89,9 @@ def open_editor(app):
     from ui import editor_window
 
     editor_window.editor_decks(app)
+
+
+def open_help(app):
+    from ui import utils
+
+    utils.help_dialog(app)
