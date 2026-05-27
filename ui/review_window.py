@@ -74,6 +74,15 @@ def select_Window(app):
     all_decks = _get_decks_with_counts()
     decks = [all_decks[i : i + 3] for i in range(0, len(all_decks), 3)]
 
+    if not all_decks:
+        empty_label = ctk.CTkLabel(
+            master=decks_Frame,
+            text="У вас пока нет колод\nСоздайте колоды и карточки в Редакторе, прежде чем начать обучение",
+            font=("Inter", 16),
+            text_color=const.TEXT_SECONDARY,
+            justify="center",
+        )
+        empty_label.grid(row=1, column=0, columnspan=3, pady=180)
     for row_index, row in enumerate(decks):
         for deck_index, deck in enumerate(row):
             deck_Frame = ctk.CTkFrame(

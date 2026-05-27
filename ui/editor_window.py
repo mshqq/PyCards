@@ -103,6 +103,15 @@ def editor_decks(app, reload=None) -> None:
     decks_frame.grid(row=1, column=0, padx=20, sticky="EW")
 
     decks_list = _get_decks_with_counts()
+    if not decks_list:
+        empty_label = ctk.CTkLabel(
+            master=decks_frame,
+            text="У вас пока нет колод\nНажмите «+ Создать», чтобы добавить первую",
+            font=("Inter", 16),
+            text_color=const.TEXT_SECONDARY,
+            justify="center",
+        )
+        empty_label.grid(row=1, column=0, pady=180)
     for index, deck in enumerate(decks_list):
         # Фрейм под колоду
         deck_frame = ctk.CTkFrame(
@@ -633,6 +642,15 @@ def editor_cards(app, deck, reload=None) -> None:
     cards_frame.grid(row=1, column=0, padx=20, sticky="EW")
 
     cards_list = _get_cards_by_deck(current_deck_id)
+    if not cards_list:
+        empty_label = ctk.CTkLabel(
+            master=cards_frame,
+            text="В этой колоде пока нет карточек\nНажмите «+ Создать», чтобы добавить первую",
+            font=("Inter", 16),
+            text_color=const.TEXT_SECONDARY,
+            justify="center",
+        )
+        empty_label.grid(row=1, column=0, pady=180)
     for index, card in enumerate(cards_list):
         # Фрейм под карточку
         card_frame = ctk.CTkFrame(
