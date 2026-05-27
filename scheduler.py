@@ -1,9 +1,9 @@
 import datetime
 
-EASE_FACTOR = 2.5
 
-
-def calculate_next(interval: int, repetitions: int, rating: str) -> (int, int, str):
+def calculate_next(
+    interval: int, repetitions: int, rating: str
+) -> tuple[float, int, str]:
     match rating:
         case "bad":
             new_interval = 1
