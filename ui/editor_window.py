@@ -101,6 +101,7 @@ def editor_decks(app, reload=None) -> None:
         scrollbar_button_color=const.SCROLLBAR_BG,
     )
     decks_frame.grid(row=1, column=0, padx=20, sticky="EW")
+    decks_frame.grid_columnconfigure(0, weight=1)
 
     decks_list = _get_decks_with_counts()
     if not decks_list:
@@ -111,7 +112,7 @@ def editor_decks(app, reload=None) -> None:
             text_color=const.TEXT_SECONDARY,
             justify="center",
         )
-        empty_label.grid(row=1, column=0, pady=180)
+        empty_label.grid(row=1, column=0, pady=180, sticky="")
     for index, deck in enumerate(decks_list):
         # Фрейм под колоду
         deck_frame = ctk.CTkFrame(
@@ -640,6 +641,7 @@ def editor_cards(app, deck, reload=None) -> None:
         scrollbar_button_color=const.SCROLLBAR_BG,
     )
     cards_frame.grid(row=1, column=0, padx=20, sticky="EW")
+    cards_frame.grid_columnconfigure(0, weight=1)
 
     cards_list = _get_cards_by_deck(current_deck_id)
     if not cards_list:
@@ -650,7 +652,7 @@ def editor_cards(app, deck, reload=None) -> None:
             text_color=const.TEXT_SECONDARY,
             justify="center",
         )
-        empty_label.grid(row=1, column=0, pady=180)
+        empty_label.grid(row=1, column=0, pady=180, sticky="")
     for index, card in enumerate(cards_list):
         # Фрейм под карточку
         card_frame = ctk.CTkFrame(
